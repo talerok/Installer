@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AutoStartCommandDescription" xml:space="preserve">
+    <value>Добавление программы {0} в автозапуск, по пути {1}</value>
+  </data>
+  <data name="AutoStartCommandParamsExceptionMessage" xml:space="preserve">
+    <value>Ошибка валидации пути записи значения автозапуска ({0})</value>
+  </data>
+  <data name="AutoStartCommandRegisterExceptionMessage" xml:space="preserve">
+    <value>Ошибка записи значения автозапуска в реестр по пути {0}</value>
+  </data>
+  <data name="CommandException" xml:space="preserve">
+    <value>Ошибка установки</value>
+  </data>
+  <data name="CommandInProc" xml:space="preserve">
+    <value>Выполняю</value>
+  </data>
+  <data name="FailInstall" xml:space="preserve">
+    <value>преравна с ошибкой</value>
+  </data>
+  <data name="InstallComplete" xml:space="preserve">
+    <value>Установка {0}. Нажмите любую клавишу.</value>
+  </data>
+  <data name="InstallerException" xml:space="preserve">
+    <value>Ошибка установшика</value>
+  </data>
+  <data name="SimpleRegisterCommandConvertExceptionMessage" xml:space="preserve">
+    <value>Ошибка конвертации значения реестра {0} в формат {1} по пути {2}</value>
+  </data>
+  <data name="SimpleRegisterCommandDescription" xml:space="preserve">
+    <value>Добавление значение {0}  в формате {1} в реестр, по пути {2}</value>
+  </data>
+  <data name="SimpleRegisterCommandRegisterExcpetionMessage" xml:space="preserve">
+    <value>Ошибка запизи значения {0} в формате {1} по пути {2}</value>
+  </data>
+  <data name="SuccesInstall" xml:space="preserve">
+    <value>завершена успешно</value>
+  </data>
+  <data name="InstallStart" xml:space="preserve">
+    <value>Запуск установки</value>
+  </data>
+  <data name="ConfigReadFail" xml:space="preserve">
+    <value>Ошибка чтения конфигурации установки</value>
+  </data>
+  <data name="ZipBundleUnpackerBundleExtractExceptionMessage" xml:space="preserve">
+    <value>Ошибка разархивирования бандла {0} в папку {1}</value>
+  </data>
+  <data name="ZipBundleUnpackerBundleNameExceptionMessage" xml:space="preserve">
+    <value>Некоректное имя бандла</value>
+  </data>
+  <data name="ZipBundleUnpackerBundlePathExceptionMessage" xml:space="preserve">
+    <value>Ошибка создания папки {0}</value>
+  </data>
+  <data name="ZipBundleUnpackerDataExceptionMessage" xml:space="preserve">
+    <value>Отсутствует данные бандла {0}</value>
+  </data>
+  <data name="ZipBundleUnpackerDesription" xml:space="preserve">
+    <value>Распаковка архива бандла {0} размером {1} байт в деректорию {2}</value>
+  </data>
+  <data name="SetVersionDescription" xml:space="preserve">
+    <value>Обновление значения версии программы {0}</value>
+  </data>
+  <data name="SetVersionException" xml:space="preserve">
+    <value>Ошибка обновления значения верссии программы {0}</value>
+  </data>
+  <data name="SetPathDescription" xml:space="preserve">
+    <value>Обновление значение директории установки {0}</value>
+  </data>
+  <data name="SetPathException" xml:space="preserve">
+    <value>Ошибка обновление значение директории установки ({0})</value>
+  </data>
+  <data name="ClearDirectoryDescription" xml:space="preserve">
+    <value>Очистка папки {0}</value>
+  </data>
+  <data name="ClearDirectoryException" xml:space="preserve">
+    <value>Ошибка очистки папки {0}</value>
+  </data>
+  <data name="ZipBundleUnpackerUndoException" xml:space="preserve">
+    <value>Ошибка отката измененй бандла {0} ({1})</value>
+  </data>
+  <data name="SimpleRegisterCommandUndoException" xml:space="preserve">
+    <value>Ошибка отката изменений значения реестра {0} по пути {2} ({3})</value>
+  </data>
+</root>

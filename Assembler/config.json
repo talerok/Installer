@@ -1,0 +1,17 @@
+{
+  "UseDefaultPath": false,
+  "DefaultPath": "",
+  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test1",
+  "Version": "4",
+  "ForVersion": null,
+  "Commands": [
+    {
+      "CommandType": "copy",
+      "Params": [
+        "testBundle",
+        "C:\\Users\\akurochkin\\Downloads\\1",
+        "test\\test2\\test3"
+      ]
+    }
+  ]
+}
