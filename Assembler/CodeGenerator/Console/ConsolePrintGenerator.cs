@@ -6,9 +6,12 @@ namespace Assembler.CodeGenerator.Console
 {
     class ConsolePrintGenerator
     {
-        public static string Generate(string msg)
+        public static string Generate(string msg, bool quotes = false)
         {
-            return $@"Console.WriteLine({msg});";
+            if(quotes)
+                return $@"Console.WriteLine(""{msg}"");";
+            else
+                return $@"Console.WriteLine({msg});";
         }
     }
 }

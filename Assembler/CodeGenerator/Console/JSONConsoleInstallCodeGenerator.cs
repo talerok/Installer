@@ -217,33 +217,33 @@ namespace Assembler.CodeGenerator.Console
                 code.AppendLine("List<IInstallCommand> commands = null;");
                 code.AppendLine("int step = 0;");
                 code.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Запуск установки")});"));
-                code.AppendLine(TryGenerator.Generate(
-                        $"{_generateAdminCheckCode(_config)}\n" +
-                        $"{_generateVersionCheckCode(_config)}\n" +
-                        $"{_generateSelectDirCode(_config)}\n" +
-                        $"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)}\n" +
-                        $"{ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString())}\n" +
-                        $"{ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Финализация установки")}")}" +
-                        $"{ForeachGenerator.Generate("command", "commands", foreachBody)}" +
-                        $"{ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Установка прошла успешно")}")}"
-                    )
-                );
 
+                var tryBody = new StringBuilder();
+                tryBody.AppendLine(_generateAdminCheckCode(_config));
+                tryBody.AppendLine(_generateAdminCheckCode(_config));
+                tryBody.AppendLine(_generateSelectDirCode(_config));
+                tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)}");
+                tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
+                tryBody.AppendLine(ConsolePrintGenerator.Generate("Финализация установки", true));
+                tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));
+                tryBody.Append(ConsolePrintGenerator.Generate("Установка прошла успешно", true));
+                code.AppendLine(TryGenerator.Generate(tryBody.ToString()));
+                
                 var InstallCatchBody = new StringBuilder();
                 InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Выполняю откат установки")}"));
+                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate("Выполняю откат установки", true));
                 InstallCatchBody.AppendLine(ForGenerator.Generate("", "step >= 0", "step--", "commands[step].Undo();"));
-                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Откат выполнен")}"));
-                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Установка завершилась с ошибкой")}"));
+                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate("Откат выполнен", true));
+                InstallCatchBody.AppendLine(ConsolePrintGenerator.Generate("Установка завершилась с ошибкой", true));
                 code.AppendLine(CatchGenerator.Generate("InstallException", "ex", InstallCatchBody.ToString()));
 
                 var catchBody = new StringBuilder();
                 catchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-                catchBody.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Установка завершилась с ошибкой")}"));
+                catchBody.AppendLine(ConsolePrintGenerator.Generate("Установка завершилась с ошибкой", true));
 
                 code.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
 
-                code.AppendLine(ConsolePrintGenerator.Generate($"{StringGenerator.Generate("Нажмите любую клавишу для продолжения")}"));
+                code.AppendLine(ConsolePrintGenerator.Generate("Нажмите любую клавишу для продолжения", true));
                 code.AppendLine("Console.ReadKey();");
                 return (code.ToString(), resources);
             }
