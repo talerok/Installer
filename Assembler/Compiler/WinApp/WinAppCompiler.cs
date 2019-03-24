@@ -1,5 +1,5 @@
 ﻿using Assembler.CodeGenerator;
-using Assembler.CodeGenerator.Console;
+using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,9 +11,9 @@ using System.Linq;
 using System.Resources;
 using System.Text;
 
-namespace Assembler.Compiler.Console
+namespace Assembler.Compiler.WinApp
 {
-    class ConsoleCompiler : ICompiler
+    class WinAppCompiler : ICompiler
     {
         private string[] _namespaces;
         private string _code;
@@ -23,7 +23,7 @@ namespace Assembler.Compiler.Console
 
         private const string _rootNameSpace = "ConsoleApp";
 
-        public ConsoleCompiler(string frameworkVer, string[] namespaces, string code, IDictionary<string, byte[]> resources)
+        public WinAppCompiler(string frameworkVer, string[] namespaces, string code, IDictionary<string, byte[]> resources)
         {
             _namespaces = namespaces;
             _code = code;
@@ -31,6 +31,8 @@ namespace Assembler.Compiler.Console
             AddFrameworkLib(frameworkVer, "mscorlib");
             AddFrameworkLib(frameworkVer, "System");
             AddFrameworkLib(frameworkVer, "System.Core");
+            AddFrameworkLib(frameworkVer, "System.Drawing");
+            AddFrameworkLib(frameworkVer, "System.Windows.Forms");
         }
 
         private static string runtimePath(string frameworkVersion, string libName) => $@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v{frameworkVersion}\Profile\Client\{libName}.dll";
@@ -39,7 +41,7 @@ namespace Assembler.Compiler.Console
         private IEnumerable<MetadataReference> _generateReferences() =>
             _frameworkLibs.Concat(_localLibs.Values).Select(x => MetadataReference.CreateFromFile(x));
 
-        private CSharpCompilationOptions _generateCompilationOptions() => new CSharpCompilationOptions(OutputKind.ConsoleApplication)
+        private CSharpCompilationOptions _generateCompilationOptions() => new CSharpCompilationOptions(OutputKind.WindowsApplication)
                     .WithOverflowChecks(false).WithOptimizationLevel(OptimizationLevel.Debug)
                     .WithUsings(this._namespaces);
 
@@ -85,12 +87,12 @@ namespace Assembler.Compiler.Console
             return libs.Select(x => KeyValuePair.Create(x.Key, File.ReadAllBytes(x.Value))).ToDictionary(x => x.Key, x => x.Value);
         }
 
-        
+
         public void Compile(string path, string filename)
         {
 
-            var generator = new ConsoleGenerator(_rootNameSpace, _namespaces, _localLibs, _code);
-            var resources = _generateResources(_generateLocalLibsResources(_localLibs).Concat(_resources).ToDictionary(x=> x.Key, x => x.Value));
+            var generator = new SimpleFormGenerator(_rootNameSpace, _namespaces, _localLibs, _code);
+            var resources = _generateResources(_generateLocalLibsResources(_localLibs).Concat(_resources).ToDictionary(x => x.Key, x => x.Value));
 
             try
             {
@@ -103,7 +105,7 @@ namespace Assembler.Compiler.Console
                 var res = compilation.Emit($@"{path}\{filename}", manifestResources: resources);
 
                 if (!res.Success)
-                    throw new CompilerException($"\n\n{ListingGenerator.GenerateCodeLisning(code)}\n\n{string.Join('\n',res.Diagnostics.Select(x => x.ToString()))}");
+                    throw new CompilerException($"\n\n{ListingGenerator.GenerateCodeLisning(code)}\n\n{string.Join('\n', res.Diagnostics.Select(x => x.ToString()))}");
             }
             catch (CodeGeneratorException ex)
             {

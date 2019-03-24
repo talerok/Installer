@@ -6,14 +6,14 @@ namespace Assembler.CodeGenerator
 {
     class ResourceResolverGenerator
     {
-        public static (string MethodCode, string InMainCode) Generate(IEnumerable<string> libs)
+        public static (string MethodCode, string InMainCode) Generate(string nmsp, IEnumerable<string> libs)
         {
             var resolveMethodBody = new StringBuilder();
             var getResxMethodBody  = new StringBuilder();
             var methodCodeRes = new StringBuilder();
             var inMainCodeRes = "AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(_resolveAssembly);";
 
-            getResxMethodBody.Append(@"System.Resources.ResourceManager rm = new System.Resources.ResourceManager(""ConsoleApp.g"", Assembly.GetExecutingAssembly());");
+            getResxMethodBody.Append($@"System.Resources.ResourceManager rm = new System.Resources.ResourceManager(""{nmsp}.g"", Assembly.GetExecutingAssembly());");
             getResxMethodBody.AppendLine(@"return rm.GetObject(name);");
 
             foreach(var lib in libs)

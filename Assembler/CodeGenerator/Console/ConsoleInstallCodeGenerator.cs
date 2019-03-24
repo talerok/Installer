@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assembler.CodeGenerator.InstallCodeGenerators;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -6,136 +7,34 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Text;
+using Assembler.InstallConfig;
 
 namespace Assembler.CodeGenerator.Console
 {
-    public static class ZipArchiveExtension
+   
+    class ConsoleInstallCodeGenerator
     {
 
-        public static void CreateEntryFromAny(this ZipArchive archive, String sourceName, String entryName = "")
-        {
-            var fileName = Path.GetFileName(sourceName);
-            if (File.GetAttributes(sourceName).HasFlag(FileAttributes.Directory))
-                archive.CreateEntryFromDirectory(sourceName, Path.Combine(entryName, fileName));
-            else
-            {
-                archive.CreateEntryFromFile(sourceName, Path.Combine(entryName, fileName), CompressionLevel.Fastest);
-            }
-        }
-
-        public static void CreateEntryFromDirectory(this ZipArchive archive, String sourceDirName, String entryName = "")
-        {
-            string[] files = Directory.GetFiles(sourceDirName).Concat(Directory.GetDirectories(sourceDirName)).ToArray();
-            foreach (var file in files)
-            {
-                var fileName = Path.GetFileName(file);
-                archive.CreateEntryFromAny(file, entryName);
-            }
-        }
-
-    }
-
-
-    class JSONConsoleInstallCodeGenerator
-    {
-        private const string _appStartCommandName = "appStart";
-        private const string _registryCommandName = "registry";
-        private const string _zipUnpackingCommnadName = "unpackZip";
-        private const string _copyCommandName = "copy";
-
-        private JSONConfig _config;
+        private Config _config;
 
         public bool UseDefaultPath { get { return _config.UseDefaultPath; } }
         public string DefaultPath { get { return _config.DefaultPath; } }
 
-        [DataContract]
-        private class JSONCommandConfig
-        {
-            [DataMember]
-            public string CommandType { get; set; }
-            [DataMember]
-            public string[] Params { get; set; }
-        }
 
-        [DataContract]
-        private class JSONConfig
+        private static string _generateCommandCode(CommandConfig commandConfig, ref IDictionary<string, byte[]> resources)
         {
-            [DataMember]
-            public bool UseDefaultPath { get; set; }
-            [DataMember]
-            public string DefaultPath { get; set; }
-            [DataMember]
-            public string RegistryVersionPath { get; set; }
-            [DataMember]
-            public string Version { get; set; }
-            [DataMember]
-            public string ForVersion { get; set; }
-            [DataMember]
-            public List<JSONCommandConfig> Commands { get; set; }
-        }
-
-        private static JSONConfig _readConfig(string path)
-        {
-            DataContractJsonSerializer jsonFormatter = new DataContractJsonSerializer(typeof(JSONConfig));
-            using (FileStream fstream = new FileStream(path, FileMode.Open))
-            {
-                var res = (JSONConfig)jsonFormatter.ReadObject(fstream);
-                return res;
-            }
-        }
-
-        private static string _generateUnpackCommand(string bundleName, string path)
-        {
-            return ObjectGenerator.Generate(
-                            null,
-                            "ZipBundleUnpacker",
-                            StringGenerator.Generate(bundleName),
-                            $@"installPath + {StringGenerator.Generate($@"\{path}")}",
-                            $@"(byte[])_getResxByName({StringGenerator.Generate(bundleName)})");
-        }
-
-        private static string _generateCommandCode(JSONCommandConfig commandConfig, JSONConfig config, IDictionary<string, byte[]> resources)
-        {
-            if (commandConfig == null || commandConfig.Params == null || config == null)
+            if (commandConfig == null || commandConfig.Params == null)
                 throw new ArgumentNullException("incorrect config");
 
-            switch (commandConfig.CommandType)
-            {
-                case _appStartCommandName:
-                    if (commandConfig.Params.Length >= 2)
-                        return ObjectGenerator.Generate(null, "AutoStart", StringGenerator.Generate(commandConfig.Params[0]), StringGenerator.Generate(commandConfig.Params[1]));
-                    break;
-                case _registryCommandName:
-                    if (commandConfig.Params.Length >= 4)
-                        return ObjectGenerator.Generate(null, "SimpleRegisterCommand", StringGenerator.Generate(commandConfig.Params[0]), StringGenerator.Generate(commandConfig.Params[1]), StringGenerator.Generate(commandConfig.Params[2]), $"RegValueKind.{commandConfig.Params[3]}");
-                    break;
-                case _zipUnpackingCommnadName:
-                    if (commandConfig.Params.Length >= 3)
-                    {
-                        var data = File.ReadAllBytes(commandConfig.Params[1]);
-                        resources.Add(commandConfig.Params[0], data);
-                        return _generateUnpackCommand(commandConfig.Params[0], commandConfig.Params[2]);
-                    }
-                    break;
-                case _copyCommandName:
-                    if (commandConfig.Params.Length >= 3)
-                    {
+            var res = InstallCommandGenerator.Generate(commandConfig.CommandName, commandConfig.Params, ref resources);
+            
+            if(res == null)
+                throw new ArgumentException("incorrect command");
 
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                                archive.CreateEntryFromAny(commandConfig.Params[1]);
-
-                            resources.Add(commandConfig.Params[0], memoryStream.ToArray());
-                            return _generateUnpackCommand(commandConfig.Params[0], commandConfig.Params[2]);
-                        }
-                    }
-                    break;
-            }
-            throw new ArgumentException("incorrect command");
+            return res;
         }
 
-        private static string _generateAdminCheckCode(JSONConfig config)
+        private static string _generateAdminCheckCode(Config config)
         {
             var res = new StringBuilder();
             res.AppendLine(ObjectGenerator.Generate("adminCheck", "AdminCheck"));
@@ -144,7 +43,7 @@ namespace Assembler.CodeGenerator.Console
             return res.ToString();
         }
 
-        private static string _generateVersionCheckCode(JSONConfig config)
+        private static string _generateVersionCheckCode(Config config)
         {
             var res = new StringBuilder();
             res.AppendLine(ObjectGenerator.Generate("versionCheck", "GetVersion", StringGenerator.Generate(config.RegistryVersionPath)));
@@ -164,7 +63,7 @@ namespace Assembler.CodeGenerator.Console
             return res.ToString();
         }
 
-        private static string _generateSelectDirCode(JSONConfig config)
+        private static string _generateSelectDirCode(Config config)
         {
             var res = new StringBuilder();
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(config.RegistryVersionPath)));
@@ -195,15 +94,15 @@ namespace Assembler.CodeGenerator.Console
             return res.ToString();
         }
 
-        public (string Code, Dictionary<string, byte[]> Resources) GetCode()
+        public (string Code, IDictionary<string, byte[]> Resources) GetCode()
         {
             try
             {
                 var code = new StringBuilder();
-                var resources = new Dictionary<string, byte[]>();
+                IDictionary<string, byte[]> resources = new Dictionary<string, byte[]>();
 
                 var commandsCode = new List<string>();
-                commandsCode.AddRange(_config.Commands.Select(x => _generateCommandCode(x, _config, resources)));
+                commandsCode.AddRange(_config.Commands.Select(x => _generateCommandCode(x, ref resources)));
                 commandsCode.Add(ObjectGenerator.Generate(null, "SetVersion", StringGenerator.Generate(_config.Version), StringGenerator.Generate(_config.RegistryVersionPath)));
                 commandsCode.Add(ObjectGenerator.Generate(null, "SetPath", "installPath", StringGenerator.Generate(_config.RegistryVersionPath)));
  
@@ -253,9 +152,9 @@ namespace Assembler.CodeGenerator.Console
             }
         }
 
-        public JSONConsoleInstallCodeGenerator(string configPath)
+        public ConsoleInstallCodeGenerator(Config config)
         {
-            _config = _readConfig(configPath);
+            _config = config;
         }
     }
 }

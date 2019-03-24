@@ -11,11 +11,46 @@ using Assembler.Compiler.Console;
 using Assembler.CodeGenerator;
 using Assembler.CodeGenerator.Console;
 using System.IO;
+using Assembler.InstallConfig;
+using Assembler.CodeGenerator.SimpleForm;
+using Assembler.Compiler.WinApp;
+using Assembler.Compiler.Interfaces;
 
 namespace Assembler
 {
     class Program
     {
+        private const string _appCompiler = "app";
+        private const string _consoleCompiler = "console";
+
+        private static bool _checkFrameworkVersion(string ver)
+        {
+            switch (ver)
+            {
+                case "3.5":
+                case "4.0":
+                case "4.5":
+                case "4.5.1":
+                case "4.5.2":
+                case "4.6":
+                case "4.6.1":
+                case "4.6.2":
+                case "4.7":
+                case "4.7.1":
+                case "4.7.2":
+                    return true;
+                default:
+                    return false;
+
+            }
+        }
+
+        private static bool _checkFrameworkVersionExists(string ver)
+        {
+            var folder = $@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v{ver}\";
+            return Directory.Exists(folder);
+        }
+
         static void Main(string[] args)
         { 
             var namespaces = new[] {
@@ -39,8 +74,38 @@ namespace Assembler
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
-                var codeInfo = new JSONConsoleInstallCodeGenerator("config.json").GetCode();
-                var compiler = new ConsoleCompiler("3.5", namespaces, codeInfo.Code, codeInfo.Resources);
+                ICompiler compiler = null;
+
+                var configReader = new JSONConfigReader("config.json");
+
+                Console.WriteLine("Введите версию .Net Framework");
+
+                var frameWorkVer = Console.ReadLine();
+
+                if (!_checkFrameworkVersion(frameWorkVer))
+                    throw new Exception("Неизвестная версия .Net Framework");
+
+                if (!_checkFrameworkVersionExists(frameWorkVer))
+                    throw new Exception($@"Версия .Net Framework {frameWorkVer} не найдена на компьютере");
+
+                Console.WriteLine($"Введите желаемый тип установшика ({_appCompiler}/{_consoleCompiler}):");
+
+                switch (Console.ReadLine().ToLower())
+                {
+                    case _appCompiler:
+                        var appCodeInfo = new SimpleFormInstallCodeGenerator(configReader.Read()).GetCode();
+                        compiler = new WinAppCompiler(frameWorkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
+                        break;
+                    case _consoleCompiler:
+                        var consoleCodeInfo = new ConsoleInstallCodeGenerator(configReader.Read()).GetCode();
+                        compiler = new ConsoleCompiler(frameWorkVer, namespaces, consoleCodeInfo.Code, consoleCodeInfo.Resources);
+                        break;
+                    default:
+                        throw new Exception("Неизвестный тип приложения");
+                }
+
+               
+
                 compiler.AddLocalLib("DotNetZip");
                 compiler.AddLocalLib("InstallerLib");
 
@@ -50,16 +115,16 @@ namespace Assembler
             }
             catch (CompilerException ex)
             {
-                Console.WriteLine("Ошибка компиляции");
+                Console.WriteLine("Ошибка компиляции:");
                 Console.WriteLine(ex.Message);
             }
             catch (CodeGeneratorException ex)
             {
-                Console.WriteLine("Ошибка генерации кода");
+                Console.WriteLine("Ошибка генерации кода:");
                 Console.WriteLine(ex.Message);
             }catch (Exception ex)
             {
-                Console.WriteLine("Ошибка");
+                Console.WriteLine("Ошибка упаковщика:");
                 Console.WriteLine(ex.Message);
             }
             Console.WriteLine("Нажмите любую клавишу для продолжения");

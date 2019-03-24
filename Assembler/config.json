@@ -1,17 +1,18 @@
 {
-  "UseDefaultPath": false,
-  "DefaultPath": "",
-  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test1",
-  "Version": "4",
-  "ForVersion": null,
-  "Commands": [
-    {
-      "CommandType": "copy",
-      "Params": [
-        "testBundle",
-        "C:\\Users\\akurochkin\\Downloads\\1",
-        "test\\test2\\test3"
-      ]
-    }
-  ]
+	"AppName": "Test programm",
+	"UseDefaultPath": false,
+	"DefaultPath": "",
+	"RegistryVersionPath": "SOFTWARE\\TestInstal\\test2",
+	"Version": "1",
+	"ForVersion": null,
+	"Commands": [
+		{
+			"CommandName": "copy",
+			"Params": [
+				"testBundle",
+				"C:\\Users\\menow\\Desktop\\src",
+				"test\\test2\\test3"
+			]
+		}
+	]
 }

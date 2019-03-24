@@ -6,10 +6,13 @@ namespace Assembler.CodeGenerator
 {
     class ClassGenerator
     {
-        public static string Generate(IEnumerable<string> modifiers, string name, string body)
+        public static string Generate(IEnumerable<string> modifiers, string name, string body, params string[] parents)
         {
             var res = new StringBuilder();
-            res.AppendLine($"{string.Join(" ", modifiers)} class {name} {{");
+            res.Append($"{string.Join(" ", modifiers)} class {name} ");
+            if (parents.Length > 0)
+                res.Append($": {string.Join(", ", parents)}");
+            res.AppendLine("{");
             res.AppendLine(body);
             res.AppendLine("}");
             return res.ToString();
