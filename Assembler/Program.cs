@@ -88,7 +88,7 @@ namespace Assembler
                 if (!_checkFrameworkVersionExists(frameWorkVer))
                     throw new Exception($@"Версия .Net Framework {frameWorkVer} не найдена на компьютере");
 
-                Console.WriteLine($"Введите желаемый тип установшика ({_appCompiler}/{_consoleCompiler}):");
+                Console.WriteLine($"Введите желаемый тип инсталятора ({_appCompiler}/{_consoleCompiler}):");
 
                 switch (Console.ReadLine().ToLower())
                 {
@@ -101,7 +101,7 @@ namespace Assembler
                         compiler = new ConsoleCompiler(frameWorkVer, namespaces, consoleCodeInfo.Code, consoleCodeInfo.Resources);
                         break;
                     default:
-                        throw new Exception("Неизвестный тип приложения");
+                        throw new Exception("Неизвестный тип инсталятора");
                 }
 
                
