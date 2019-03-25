@@ -61,6 +61,7 @@
     <Compile Include="Installer\InstallCommand\Registry\SetPath.cs" />
     <Compile Include="Installer\InstallCommand\Registry\SetVersion.cs" />
     <Compile Include="Installer\InstallCommand\Registry\SimpleRegisterCommand.cs" />
+    <Compile Include="Installer\InstallCommand\Unpacking\Replace.cs" />
     <Compile Include="Installer\InstallCommand\Unpacking\ZipBundleUnpacker.cs" />
     <Compile Include="Installer\InstallInfo\GetPath.cs" />
     <Compile Include="Installer\InstallInfo\GetVersion.cs" />

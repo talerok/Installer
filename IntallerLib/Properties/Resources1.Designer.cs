@@ -169,6 +169,24 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Обновление папки {0} (бандл: {1}).
+        /// </summary>
+        internal static string ReplaceDescription {
+            get {
+                return ResourceManager.GetString("ReplaceDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка обновление папки {0} (бандл: {1}) ({2}).
+        /// </summary>
+        internal static string ReplaceException {
+            get {
+                return ResourceManager.GetString("ReplaceException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Обновление значение директории установки {0}.
         /// </summary>
         internal static string SetPathDescription {

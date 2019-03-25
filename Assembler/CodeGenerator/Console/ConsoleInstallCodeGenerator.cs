@@ -121,7 +121,7 @@ namespace Assembler.CodeGenerator.Console
                 tryBody.AppendLine(_generateAdminCheckCode(_config));
                 tryBody.AppendLine(_generateAdminCheckCode(_config));
                 tryBody.AppendLine(_generateSelectDirCode(_config));
-                tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)}");
+                tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
                 tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
                 tryBody.AppendLine(ConsolePrintGenerator.Generate("Финализация установки", true));
                 tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));

@@ -198,4 +198,10 @@
   <data name="SimpleRegisterCommandUndoException" xml:space="preserve">
     <value>Ошибка отката изменений значения реестра {0} по пути {2} ({3})</value>
   </data>
+  <data name="ReplaceDescription" xml:space="preserve">
+    <value>Обновление папки {0} (бандл: {1})</value>
+  </data>
+  <data name="ReplaceException" xml:space="preserve">
+    <value>Ошибка обновление папки {0} (бандл: {1}) ({2})</value>
+  </data>
 </root>

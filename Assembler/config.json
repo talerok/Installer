@@ -2,17 +2,18 @@
 	"AppName": "Test programm",
 	"UseDefaultPath": false,
 	"DefaultPath": "",
-	"RegistryVersionPath": "SOFTWARE\\TestInstal\\test2",
-	"Version": "1",
-	"ForVersion": null,
+	"RegistryVersionPath": "SOFTWARE\\TestInstal\\test4",
+	"Version": "3",
+	"ForVersion": "2",
 	"Commands": [
-		{
-			"CommandName": "copy",
-			"Params": [
-				"testBundle",
-				"C:\\Users\\menow\\Desktop\\src",
-				"test\\test2\\test3"
-			]
-		}
+    {
+      "CommandName": "substitute",
+      "Params": [
+        "testBundle",
+        "",
+        "D:\\InstallTest\\Testing\\2",
+        "D:\\InstallTest\\Testing\\3"
+      ]
+    }
 	]
 }

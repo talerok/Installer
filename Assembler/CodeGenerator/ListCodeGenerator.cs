@@ -19,7 +19,8 @@ namespace Assembler.CodeGenerator
                 res.AppendLine(string.Join(",\n", body));
                 res.Append(" }");
             }
-            res.AppendLine(";");
+            if (name != null)
+                res.AppendLine(";");
             return res.ToString();
         }
     }

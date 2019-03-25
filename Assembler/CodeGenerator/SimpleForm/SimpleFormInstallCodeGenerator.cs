@@ -74,6 +74,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                 res.AppendLine(@"if (installPath == null)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
                 res.AppendLine("pathTextBox.Text = installPath;");
+                res.AppendLine("SelectPathButton.Enabled = false;");
             }
             else
             {
@@ -84,8 +85,8 @@ namespace Assembler.CodeGenerator.SimpleForm
                 res.AppendLine($"pathTextBox.Text = {StringGenerator.Generate(_config.DefaultPath)};");
                 res.AppendLine("} else {");
                 res.AppendLine("pathTextBox.Text = installPath;");
-                if (!_config.UseDefaultPath)
-                    res.AppendLine("SelectPathButton.Enabled = false;");
+                res.AppendLine("SelectPathButton.Enabled = false;");
+                res.AppendLine("_clearDir = true;");
                 res.AppendLine("}");
             }
             return MethodGenerator.Generate(new string[] { "private" }, "void", "_preapareForm", new string[] { }, res.ToString());
@@ -95,13 +96,13 @@ namespace Assembler.CodeGenerator.SimpleForm
         {
             var tryBody = new StringBuilder();
             tryBody.AppendLine("_checkAdmin();");
+            tryBody.AppendLine("_checkVersion();");
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("_preapareForm();");
-            tryBody.AppendLine("_checkVersion();");
 
             var catchBody = new StringBuilder();
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
-            catchBody.AppendLine("this.Close();");
+            catchBody.AppendLine("Environment.Exit(-1);");
 
             var res = new StringBuilder();
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
@@ -143,7 +144,11 @@ namespace Assembler.CodeGenerator.SimpleForm
             code.AppendLine(_generateInstallProccesTextPring("Запуск установки", true));
 
             var tryBody = new StringBuilder();
-            tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)}");
+            tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
+
+            tryBody.AppendLine($"if(_clearDir)");
+            tryBody.AppendLine($@"commands.Insert(0, {ObjectGenerator.Generate(null, "ClearDirectory", "installPath")});");
+
             tryBody.AppendLine($"InstallProgressBar.Maximum = commands.Count;");
             tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
             tryBody.AppendLine(_generateInstallProccesTextPring("Финализация установки", true));
@@ -183,6 +188,8 @@ namespace Assembler.CodeGenerator.SimpleForm
 
 
                 var formClassBody = new StringBuilder();
+
+                formClassBody.AppendLine("private bool _clearDir = false;");          
                 formClassBody.AppendLine(SimpleFormSettingsGenerator.Generate());
                 formClassBody.AppendLine(_generatePrepareFormMethod());
                 formClassBody.AppendLine(_generateVersionCheckMethod());
