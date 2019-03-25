@@ -65,40 +65,33 @@ namespace Assembler
 
             try
             {
-                Console.WriteLine("Введите путь:");
-                var path = Console.ReadLine();
+                var config = new JSONConfigReader("config.json").Read();
 
-                var dir = Path.GetDirectoryName(path);
-                var file = Path.GetFileName(path);
+                var dir = Path.GetDirectoryName(config.OutputPath);
+                var file = Path.GetFileName(config.OutputPath);
 
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
                 ICompiler compiler = null;
 
-                var configReader = new JSONConfigReader("config.json");
+                
 
-                Console.WriteLine("Введите версию .Net Framework");
-
-                var frameWorkVer = Console.ReadLine();
-
-                if (!_checkFrameworkVersion(frameWorkVer))
+                if (!_checkFrameworkVersion(config.FrameworkVer))
                     throw new Exception("Неизвестная версия .Net Framework");
 
-                if (!_checkFrameworkVersionExists(frameWorkVer))
-                    throw new Exception($@"Версия .Net Framework {frameWorkVer} не найдена на компьютере");
+                if (!_checkFrameworkVersionExists(config.FrameworkVer))
+                    throw new Exception($@"Версия .Net Framework {config.FrameworkVer} не найдена на компьютере");
 
-                Console.WriteLine($"Введите желаемый тип инсталятора ({_appCompiler}/{_consoleCompiler}):");
-
-                switch (Console.ReadLine().ToLower())
+                switch (config.Type)
                 {
                     case _appCompiler:
-                        var appCodeInfo = new SimpleFormInstallCodeGenerator(configReader.Read()).GetCode();
-                        compiler = new WinAppCompiler(frameWorkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
+                        var appCodeInfo = new SimpleFormInstallCodeGenerator(config).GetCode();
+                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
                         break;
                     case _consoleCompiler:
-                        var consoleCodeInfo = new ConsoleInstallCodeGenerator(configReader.Read()).GetCode();
-                        compiler = new ConsoleCompiler(frameWorkVer, namespaces, consoleCodeInfo.Code, consoleCodeInfo.Resources);
+                        var consoleCodeInfo = new ConsoleInstallCodeGenerator(config).GetCode();
+                        compiler = new ConsoleCompiler(config.FrameworkVer, namespaces, consoleCodeInfo.Code, consoleCodeInfo.Resources);
                         break;
                     default:
                         throw new Exception("Неизвестный тип инсталятора");

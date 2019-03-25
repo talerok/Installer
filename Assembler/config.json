@@ -1,11 +1,15 @@
 {
-	"AppName": "Test programm",
-	"UseDefaultPath": false,
-	"DefaultPath": "",
-	"RegistryVersionPath": "SOFTWARE\\TestInstal\\test4",
-	"Version": "3",
-	"ForVersion": "2",
-	"Commands": [
+  "OutputPath": "D:\\InstallTest\\Result\\3.exe",
+  "FrameworkVer": "3.5",
+  "Type": "app",
+  "AppName": "Test programm",
+  "UseDefaultPath": false,
+  "DefaultPath": "",
+  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test55",
+  "Version": "3",
+  "MinVersion": "1",
+  "MaxVersion": "2",
+  "Commands": [
     {
       "CommandName": "substitute",
       "Params": [
@@ -15,5 +19,8 @@
         "D:\\InstallTest\\Testing\\3"
       ]
     }
-	]
+  ],
+  "StartAfterInstall": [
+
+  ]
 }

@@ -48,18 +48,21 @@ namespace Assembler.CodeGenerator.Console
             var res = new StringBuilder();
             res.AppendLine(ObjectGenerator.Generate("versionCheck", "GetVersion", StringGenerator.Generate(config.RegistryVersionPath)));
             res.AppendLine($@"var currentVersion = versionCheck.GetInfo();");
-            if (string.IsNullOrEmpty(config.ForVersion))
+            if (string.IsNullOrEmpty(config.MinVersion) && string.IsNullOrEmpty(config.MaxVersion))
             {
                 res.AppendLine($@"if(currentVersion != null && currentVersion.CompareTo(""{config.Version}"") != -1)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Уже установленна более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {config.Version})"""));
+                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установленна более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {config.Version})"""));
             }
-            else
+            if(!string.IsNullOrEmpty(config.MinVersion))
             {
-                res.AppendLine($@"if(currentVersion != ""{config.ForVersion}"")");
-               res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Не подходящая версия программы (текущая версия: "" + currentVersion + "", необходимая версия: {config.ForVersion})"""));
-                                
+               res.AppendLine($@"if(currentVersion.CompareTo({StringGenerator.Generate(config.MinVersion)}) == -1)");
+               res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Не подходящая версия программы (текущая версия: "" + currentVersion + "", минимальная возможная версия: {config.MinVersion})"""));
             }
-            
+            if (!string.IsNullOrEmpty(config.MaxVersion))
+            {
+                res.AppendLine($@"if(currentVersion.CompareTo({StringGenerator.Generate(config.MaxVersion)}) == 1)");
+                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Не подходящая версия программы (текущая версия: "" + currentVersion + "", максимальная возможная версия: {config.MaxVersion})"""));
+            }
             return res.ToString();
         }
 
@@ -69,7 +72,7 @@ namespace Assembler.CodeGenerator.Console
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(config.RegistryVersionPath)));
             res.AppendLine($@"var installPath = pathCheck.GetInfo();");
 
-            if (!string.IsNullOrEmpty(config.ForVersion))
+            if (!string.IsNullOrEmpty(config.MinVersion) && !string.IsNullOrEmpty(config.MaxVersion))
             {
                 res.AppendLine(@"if (installPath == null)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
