@@ -6,10 +6,8 @@ using System.Collections.Generic;
 using System.Text;
 
 using Assembler.Compiler;
-using Assembler.Compiler.Console;
 
 using Assembler.CodeGenerator;
-using Assembler.CodeGenerator.Console;
 using System.IO;
 using Assembler.InstallConfig;
 using Assembler.CodeGenerator.SimpleForm;
@@ -20,8 +18,7 @@ namespace Assembler
 {
     class Program
     {
-        private const string _appCompiler = "app";
-        private const string _consoleCompiler = "console";
+        private const string _simpleType = "simple";
 
         private static bool _checkFrameworkVersion(string ver)
         {
@@ -85,13 +82,9 @@ namespace Assembler
 
                 switch (config.Type)
                 {
-                    case _appCompiler:
+                    case _simpleType:
                         var appCodeInfo = new SimpleFormInstallCodeGenerator(config).GetCode();
                         compiler = new WinAppCompiler(config.FrameworkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
-                        break;
-                    case _consoleCompiler:
-                        var consoleCodeInfo = new ConsoleInstallCodeGenerator(config).GetCode();
-                        compiler = new ConsoleCompiler(config.FrameworkVer, namespaces, consoleCodeInfo.Code, consoleCodeInfo.Resources);
                         break;
                     default:
                         throw new Exception("Неизвестный тип инсталятора");

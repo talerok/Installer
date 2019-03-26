@@ -98,7 +98,7 @@ namespace Assembler.Compiler.WinApp
             {
                 var code = generator.Generate();
 
-                var parsedSyntaxTree = _parse(code, "", CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp5));
+                var parsedSyntaxTree = _parse(code, "", CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7));
                 var compilation
                    = CSharpCompilation.Create(_rootNameSpace, new SyntaxTree[] { parsedSyntaxTree }, _generateReferences(), _generateCompilationOptions());
 

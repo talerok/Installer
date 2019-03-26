@@ -1,11 +1,11 @@
 {
   "OutputPath": "D:\\InstallTest\\3.exe",
   "FrameworkVer": "3.5",
-  "Type": "app",
+  "Type": "simple",
   "AppName": "Test programm",
   "UseDefaultPath": false,
   "DefaultPath": "",
-  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test5556",
+  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test56712",
   "Version": "1",
   "MinVersion": null,
   "MaxVersion": null,

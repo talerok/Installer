@@ -1,5 +1,4 @@
-﻿using Assembler.CodeGenerator.Console;
-using Assembler.CodeGenerator.InstallCodeGenerators;
+﻿using Assembler.CodeGenerator.InstallCodeGenerators;
 using Assembler.InstallConfig;
 using System;
 using System.Collections.Generic;
@@ -12,25 +11,9 @@ namespace Assembler.CodeGenerator.SimpleForm
     {
         private Config _config;
 
-        public bool UseDefaultPath { get { return _config.UseDefaultPath; } }
-        public string DefaultPath { get { return _config.DefaultPath; } }
-
         private string _generateInstallProccesTextPring(string text, bool quotes = false) => quotes ? $@"InstallProccessTextBox.AppendText({StringGenerator.Generate(text)} + ""\n"");" : $@"InstallProccessTextBox.AppendText({text} + ""\n"");";
 
         private bool _checkStartAfterInstall() => _config.StartAfterInstall.Any();
-
-        private static string _generateCommandCode(CommandConfig commandConfig, ref IDictionary<string, byte[]> resources)
-        {
-            if (commandConfig == null || commandConfig.Params == null)
-                throw new ArgumentNullException("incorrect config");
-
-            var res = InstallCommandGenerator.Generate(commandConfig.CommandName, commandConfig.Params, ref resources);
-
-            if (res == null)
-                throw new ArgumentException("incorrect command");
-
-            return res;
-        }
 
         private string _generateAdminCheckMethod()
         {
@@ -108,7 +91,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             tryBody.AppendLine("_checkVersion();");
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("_preapareForm();");
-
+            tryBody.AppendLine("InstallProcessEventHandler += _installEvent;");
             var catchBody = new StringBuilder();
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(-1);");
@@ -131,60 +114,51 @@ namespace Assembler.CodeGenerator.SimpleForm
 
         private string _generateInstallButtonClickMethod(IDictionary<string, byte[]> resources)
         {
-            var code = new StringBuilder();
-            code.AppendLine("_blockButtons();");
-            code.AppendLine($@"var installPath = pathTextBox.Text;");
-
-            var commandsCode = new List<string>();
-            commandsCode.AddRange(_config.Commands.Select(x => _generateCommandCode(x, ref resources)));
-            commandsCode.Add(ObjectGenerator.Generate(null, "SetVersion", StringGenerator.Generate(_config.Version), StringGenerator.Generate(_config.RegistryVersionPath)));
-            commandsCode.Add(ObjectGenerator.Generate(null, "SetPath", "installPath", StringGenerator.Generate(_config.RegistryVersionPath)));
-
-            var forBody = new StringBuilder();
-            forBody.AppendLine("var command = commands[step];");
-            forBody.AppendLine(_generateInstallProccesTextPring("command.Description"));
-            forBody.AppendLine("InstallProgressBar.Value++;");
-            forBody.AppendLine("command.Do();");
-
-            var foreachBody = "command.Finish();";
-
-            code.AppendLine("List<IInstallCommand> commands = null;");
-            code.AppendLine("int step = 0;");
-            code.AppendLine(_generateInstallProccesTextPring("Запуск установки", true));
-
-            var tryBody = new StringBuilder();
-            tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
-
-            tryBody.AppendLine($"if(_clearDir)");
-            tryBody.AppendLine($@"commands.Insert(0, {ObjectGenerator.Generate(null, "ClearDirectory", "installPath")});");
-
-            tryBody.AppendLine($"InstallProgressBar.Maximum = commands.Count;");
-            tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
-            tryBody.AppendLine(_generateInstallProccesTextPring("Финализация установки", true));
-            tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));
-            tryBody.AppendLine(_generateInstallProccesTextPring("Установка прошла успешно", true));
-            tryBody.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate("Установка прошла успешно")));
-            tryBody.AppendLine("_startProgramm();");
-            code.AppendLine(TryGenerator.Generate(tryBody.ToString()));
-
-            var InstallCatchBody = new StringBuilder();
-            InstallCatchBody.AppendLine(_generateInstallProccesTextPring($"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-            InstallCatchBody.AppendLine(_generateInstallProccesTextPring("Выполняю откат установки", true));
-            InstallCatchBody.AppendLine(ForGenerator.Generate("", "step >= 0", "step--", "commands[step].Undo();\nInstallProgressBar.Value--;"));
-            InstallCatchBody.AppendLine(_generateInstallProccesTextPring("Откат выполнен", true));
-            InstallCatchBody.AppendLine(_generateInstallProccesTextPring("Установка завершилась с ошибкой", true));
-            InstallCatchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "ex.Message"));
-            code.AppendLine(CatchGenerator.Generate("InstallException", "ex", InstallCatchBody.ToString()));
-
-            var catchBody = new StringBuilder();
-            catchBody.AppendLine(_generateInstallProccesTextPring($"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-            catchBody.AppendLine(_generateInstallProccesTextPring("Установка завершилась с ошибкой", true));
-            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "ex.Message"));
-
-            code.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
+            var code = new StringBuilder("_blockButtons();");
+            code.AppendLine(InstallProcessGenerator.Generate(_config, resources, "pathTextBox.Text", "_clearDir"));
             code.AppendLine("CloseButton.Enabled = true;");
 
             return MethodGenerator.Generate(new string[] { "private" }, "void", "InstallButton_Click", new string[] { "object sender", "EventArgs e" }, code.ToString());
+        }
+
+        private string _generateInstallEventMethod()
+        {
+            var body = new StringBuilder();
+
+            body.AppendLine("switch(args.EventType) {");
+
+            body.AppendLine("case InstallEventType.Message:");
+            body.AppendLine(_generateInstallProccesTextPring("(string)args.Info"));
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.Error:");
+            body.AppendLine(_generateInstallProccesTextPring("(string)args.Info"));
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.SuccesInstall:");
+            body.AppendLine(_generateInstallProccesTextPring("Установка прошла успешно", true));
+            body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate("Установка прошла успешно")));
+            body.AppendLine("_startProgram();");
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.FailInstall:");
+            body.AppendLine(_generateInstallProccesTextPring("Установка завершилась с ошибкой", true));
+            body.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "(string)args.Info"));
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.SetProgresMaxValue:");
+            body.AppendLine("InstallProgressBar.Maximum = (int)args.Info;");
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.IncreaseProgress:");
+            body.AppendLine("InstallProgressBar.Value++;");
+            body.AppendLine("break;");
+
+            body.AppendLine("case InstallEventType.DecreaseProgress:");
+            body.AppendLine("InstallProgressBar.Value--;");
+            body.AppendLine("break;");
+            body.AppendLine("}");
+            return InstallProcessGenerator.GenerateEventMethod(new string[] { "private" }, "_installEvent", "args", body.ToString());
         }
 
         private string _generateCloseButtonClickMethod()
@@ -205,7 +179,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                 res.AppendLine(ListCodeGenerator.Generate("paths", "string", _config.StartAfterInstall.Select(x => StringGenerator.Generate(x))));
                 res.AppendLine(ForeachGenerator.Generate("path", "paths", $@"System.Diagnostics.Process.Start(installPath + {StringGenerator.Generate(@"\")} + path);"));
             }
-            return MethodGenerator.Generate(new string[] { "private" }, "void", "_startProgramm", new string[] { }, res.ToString());
+            return MethodGenerator.Generate(new string[] { "private" }, "void", "_startProgram", new string[] { }, res.ToString());
         }
        
         private string _generateBlockButtonsMethod()
@@ -227,8 +201,10 @@ namespace Assembler.CodeGenerator.SimpleForm
 
                 var formClassBody = new StringBuilder();
 
-                formClassBody.AppendLine("private bool _clearDir = false;");          
+                formClassBody.AppendLine("private bool _clearDir = false;");
                 formClassBody.AppendLine(SimpleFormSettingsGenerator.Generate());
+                formClassBody.AppendLine(InstallProcessGenerator.GenerateAuxiliaryCode("InstallProcessEventHandler"));
+                formClassBody.AppendLine(_generateInstallEventMethod());
                 formClassBody.AppendLine(_generatePrepareFormMethod());
                 formClassBody.AppendLine(_generateVersionCheckMethod());
                 formClassBody.AppendLine(_generateAdminCheckMethod());
