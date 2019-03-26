@@ -15,7 +15,9 @@ namespace Assembler.CodeGenerator.SimpleForm
         public bool UseDefaultPath { get { return _config.UseDefaultPath; } }
         public string DefaultPath { get { return _config.DefaultPath; } }
 
-        private string _generateInstallProccesTextPring(string text, bool quotes = false) => quotes ? $@"InstallProccessTextBox.AppendText({StringGenerator.Generate(text)} + ""\n"");" : $@"InstallProccessTextBox.AppendText({text} + ""\n"");";   
+        private string _generateInstallProccesTextPring(string text, bool quotes = false) => quotes ? $@"InstallProccessTextBox.AppendText({StringGenerator.Generate(text)} + ""\n"");" : $@"InstallProccessTextBox.AppendText({text} + ""\n"");";
+
+        private bool _checkStartAfterInstall() => _config.StartAfterInstall.Any();
 
         private static string _generateCommandCode(CommandConfig commandConfig, ref IDictionary<string, byte[]> resources)
         {
@@ -72,6 +74,9 @@ namespace Assembler.CodeGenerator.SimpleForm
 
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(_config.RegistryVersionPath)));
             res.AppendLine($@"var installPath = pathCheck.GetInfo();");
+
+            if (!_checkStartAfterInstall())
+                res.AppendLine("StartProgramCheckBox.Visible = false;");
 
             if (!string.IsNullOrEmpty(_config.MinVersion) && !string.IsNullOrEmpty(_config.MaxVersion))
             {
@@ -159,6 +164,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));
             tryBody.AppendLine(_generateInstallProccesTextPring("Установка прошла успешно", true));
             tryBody.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate("Установка прошла успешно")));
+            tryBody.AppendLine("_startProgramm();");
             code.AppendLine(TryGenerator.Generate(tryBody.ToString()));
 
             var InstallCatchBody = new StringBuilder();
@@ -176,8 +182,41 @@ namespace Assembler.CodeGenerator.SimpleForm
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "ex.Message"));
 
             code.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
+            code.AppendLine("CloseButton.Enabled = true;");
 
             return MethodGenerator.Generate(new string[] { "private" }, "void", "InstallButton_Click", new string[] { "object sender", "EventArgs e" }, code.ToString());
+        }
+
+        private string _generateCloseButtonClickMethod()
+        {
+            return MethodGenerator.Generate(new string[] { "private" }, "void", "CloseButton_Click", new string[] { "object sender", "EventArgs e" }, "Environment.Exit(0);");
+        }
+
+        private string _generateStartProgrammMethod()
+        {
+            var res = new StringBuilder();
+
+            if (_checkStartAfterInstall())
+            {
+                res.AppendLine("if(!StartProgramCheckBox.Checked)");
+                res.AppendLine("return;");
+
+                res.AppendLine($@"var installPath = pathTextBox.Text;");
+                res.AppendLine(ListCodeGenerator.Generate("paths", "string", _config.StartAfterInstall.Select(x => StringGenerator.Generate(x))));
+                res.AppendLine(ForeachGenerator.Generate("path", "paths", $@"System.Diagnostics.Process.Start(installPath + {StringGenerator.Generate(@"\")} + path);"));
+            }
+            return MethodGenerator.Generate(new string[] { "private" }, "void", "_startProgramm", new string[] { }, res.ToString());
+        }
+       
+        private string _generateBlockButtonsMethod()
+        {
+            var res = new StringBuilder();
+            res.AppendLine("SelectPathButton.Enabled = false;");
+            res.AppendLine("InstallButton.Enabled = false;");
+            res.AppendLine("CloseButton.Enabled = false;");
+            if(_checkStartAfterInstall())
+                res.AppendLine("StartProgramCheckBox.Enabled = false;");
+            return MethodGenerator.Generate(new string[] { "private" }, "void", "_blockButtons", new string[] { }, res.ToString());
         }
 
         public (string Code, IDictionary<string, byte[]> Resources) GetCode()
@@ -185,11 +224,6 @@ namespace Assembler.CodeGenerator.SimpleForm
             try
             {
                 IDictionary<string, byte[]> resources = new Dictionary<string, byte[]>();
-
-                var blockButtonsMethodBody = new StringBuilder();
-                blockButtonsMethodBody.AppendLine("SelectPathButton.Enabled = false;");
-                blockButtonsMethodBody.AppendLine("InstallButton.Enabled = false;");
-
 
                 var formClassBody = new StringBuilder();
 
@@ -200,8 +234,10 @@ namespace Assembler.CodeGenerator.SimpleForm
                 formClassBody.AppendLine(_generateAdminCheckMethod());
                 formClassBody.AppendLine(_generateFormConstructor());
                 formClassBody.AppendLine(_generateSelectPathButtonClickMethod());
+                formClassBody.AppendLine(_generateCloseButtonClickMethod());
                 formClassBody.AppendLine(_generateInstallButtonClickMethod(resources));
-                formClassBody.AppendLine(MethodGenerator.Generate(new string[] { "private" }, "void", "_blockButtons", new string[] { }, blockButtonsMethodBody.ToString()));
+                formClassBody.AppendLine(_generateBlockButtonsMethod());
+                formClassBody.AppendLine(_generateStartProgrammMethod());
 
                 return (ClassGenerator.Generate(new string[] { "public" }, "Form1", formClassBody.ToString(), "Form"), resources);
             }

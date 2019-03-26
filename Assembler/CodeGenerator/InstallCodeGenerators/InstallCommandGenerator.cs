@@ -56,19 +56,19 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                 case _zipUnpackingCommnadName:
                     if (commandParams.Length < 3)
                         return null;
-                    var data = File.ReadAllBytes(commandParams[1]);
+                    var data = File.ReadAllBytes(commandParams[2]);
                     resources.Add(commandParams[0], data);
-                    return _generateUnpackCommand(commandParams[0], commandParams[2]);
+                    return _generateUnpackCommand(commandParams[0], commandParams[1]);
                 case _copyCommandName:
                     if (commandParams.Length < 3)
                         return null; 
                     using (var memoryStream = new MemoryStream())
                     {
                         using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                            archive.CreateEntryFromDirectory(commandParams[1]);
+                            archive.CreateEntryFromDirectory(commandParams[2]);
 
                         resources.Add(commandParams[0], memoryStream.ToArray());
-                        return _generateUnpackCommand(commandParams[0], commandParams[2]);
+                        return _generateUnpackCommand(commandParams[0], commandParams[1]);
                     }
                 case _substituteCommandName:
                     if (commandParams.Length < 4)
