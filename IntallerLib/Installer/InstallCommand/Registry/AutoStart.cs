@@ -12,7 +12,7 @@ namespace InstallerLib.Installer.InstallCommand.Registry
     {
         private string _appName;
         private string _path;
-        private string _backupValue = null;
+
         private SimpleRegisterCommand _regCommand;
 
         public string Description

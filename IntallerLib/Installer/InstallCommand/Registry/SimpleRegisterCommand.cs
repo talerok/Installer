@@ -121,7 +121,7 @@ namespace InstallerLib.Installer.InstallCommand.Registry
                     curDir.SetValue(_name, val, keyKind);              
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 throw new InstallException(_generateRegisterExcpetionMessage());
             }

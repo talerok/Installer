@@ -33,7 +33,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
                 System.IO.Directory.Move(_path, _tempPath);
                 System.IO.Directory.CreateDirectory(_path);
             }
-            catch (Exception ex)
+            catch
             {
                 new InstallException(string.Format(Properties.Resources.ClearDirectoryException, _path));
             }
