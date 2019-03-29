@@ -4,6 +4,7 @@ using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using System;
 using System.Collections.Generic;
@@ -21,14 +22,16 @@ namespace Assembler.Compiler.WinApp
         private List<string> _frameworkLibs = new List<string>();
         private Dictionary<string, string> _localLibs = new Dictionary<string, string>();
         private IDictionary<string, byte[]> _resources;
+        private string _iconPath = null;
 
         private const string _rootNameSpace = "WinApp";
 
-        public WinAppCompiler(string frameworkVer, string[] namespaces, string code, IDictionary<string, byte[]> resources)
+        public WinAppCompiler(string frameworkVer, string[] namespaces, string code, IDictionary<string, byte[]> resources, string iconPath = null)
         {
             _namespaces = namespaces;
             _code = code;
             _resources = resources;
+            _iconPath = iconPath;
             AddFrameworkLib(frameworkVer, "mscorlib");
             AddFrameworkLib(frameworkVer, "System");
             AddFrameworkLib(frameworkVer, "System.Core");
@@ -42,13 +45,12 @@ namespace Assembler.Compiler.WinApp
             _frameworkLibs.Concat(_localLibs.Values).Select(x => MetadataReference.CreateFromFile(x));
 
         private CSharpCompilationOptions _generateCompilationOptions() => new CSharpCompilationOptions(OutputKind.WindowsApplication)
-                    .WithOverflowChecks(false).WithOptimizationLevel(OptimizationLevel.Debug)
-                    .WithUsings(this._namespaces);
+                    .WithOverflowChecks(false).WithOptimizationLevel(OptimizationLevel.Release);
 
-        private static SyntaxTree _parse(string text, string filename = "", CSharpParseOptions options = null)
+        private static SyntaxTree _parse(string text, CSharpParseOptions options = null)
         {
             var stringText = SourceText.From(text, Encoding.UTF8);
-            return SyntaxFactory.ParseSyntaxTree(stringText, options, filename);
+            return SyntaxFactory.ParseSyntaxTree(stringText, options);
         }
 
         public void AddLocalLib(string libName)
@@ -63,6 +65,7 @@ namespace Assembler.Compiler.WinApp
 
         private IEnumerable<ResourceDescription> _generateResources(IDictionary<string, byte[]> resources)
         {
+
             List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
             string resourcePath = string.Format("{0}.g.resources", _rootNameSpace);
             ResourceWriter rsWriter = new ResourceWriter(resourcePath);
@@ -88,7 +91,7 @@ namespace Assembler.Compiler.WinApp
         }
 
 
-        public void Compile(string path, string filename)
+        public void Compile(string path)
         {
 
             var generator = new FormGenerator(_rootNameSpace, _namespaces, _localLibs, _code);
@@ -103,11 +106,20 @@ namespace Assembler.Compiler.WinApp
 
                 File.WriteAllText("listing.txt", ListingGenerator.GenerateCodeLisning(code, false));
 
-                var parsedSyntaxTree = _parse(code, "", CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7));
+                var parsedSyntaxTree = _parse(code, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7));
                 var compilation
                    = CSharpCompilation.Create(_rootNameSpace, new SyntaxTree[] { parsedSyntaxTree }, _generateReferences(), _generateCompilationOptions());
 
-                var res = compilation.Emit($@"{path}\{filename}", manifestResources: resources);
+                EmitResult res;
+
+                using (FileStream fstream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    res = compilation.Emit(
+                        peStream: fstream,
+                        manifestResources: resources,
+                        win32Resources: compilation.CreateDefaultWin32Resources(true, false, null, File.OpenRead(_iconPath))
+                    );
+                }
 
                 if (!res.Success)
                     throw new CompilerException($"\n\n{ListingGenerator.GenerateCodeLisning(code)}\n\n{string.Join('\n', res.Diagnostics.Select(x => x.ToString()))}");

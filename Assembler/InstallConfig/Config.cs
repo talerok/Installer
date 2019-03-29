@@ -13,6 +13,8 @@ namespace Assembler.InstallConfig
     class Config
     {
         public string OutputPath { get; set; }
+        public string IconPath { get; set; }
+
         public string FrameworkVer { get; set; }
         public string Type { get; set; }
 

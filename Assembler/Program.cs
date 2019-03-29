@@ -79,7 +79,6 @@ namespace Assembler
                 var config = new JSONConfigReader("config.json").Read();
 
                 var dir = Path.GetDirectoryName(config.OutputPath);
-                var file = Path.GetFileName(config.OutputPath);
 
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
@@ -110,11 +109,11 @@ namespace Assembler
                 {
                     case _simpleType:
                         var appCodeInfo = new SimpleFormInstallCodeGenerator(config).GetCode();
-                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
+                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources, config.IconPath);
                         break;
                     case _advancedType:
                         var advCodeInfo = new AdvancedFormInstallCodeGenerator(config).GetCode();
-                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, advCodeInfo.Code, advCodeInfo.Resources);
+                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, advCodeInfo.Code, advCodeInfo.Resources, config.IconPath);
                         break;
                     default:
                         throw new Exception("Неизвестный тип инсталятора");
@@ -123,8 +122,8 @@ namespace Assembler
                 foreach (var lib in Directory.GetFiles("Libs", "*.dll"))
                     compiler.AddLocalLib(lib);
 
-                Console.WriteLine($"Сборка инсталятора {file}");
-                compiler.Compile(dir, file);
+                Console.WriteLine($"Сборка инсталятора {config.OutputPath}");
+                compiler.Compile(config.OutputPath);
                 Console.WriteLine("Инсталятор собран");
             }
             catch (CompilerException ex)

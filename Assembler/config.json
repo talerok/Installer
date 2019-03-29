@@ -1,5 +1,6 @@
 ﻿{
-  "OutputPath": "D:\\InstallTest\\4.exe",
+  "OutputPath": "D:\\InstallTest\\5.exe",
+  "IconPath": "C:\\Users\\akurochkin\\Downloads\\Icon.ico",
   "FrameworkVer": "3.5",
   "Type": "advanced",
   "AppName": "Test programm 455",
@@ -17,13 +18,13 @@
     "vs.exe"
   ],
   "DesktopShortCuts": [
-   
+
   ],
   "StartMenuShortCuts": [
-    
+
   ],
   "AutoStart": [
-   
+
   ]
 
 }

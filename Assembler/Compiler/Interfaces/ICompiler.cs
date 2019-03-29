@@ -6,7 +6,7 @@ namespace Assembler.Compiler.Interfaces
 {
     interface ICompiler
     {
-        void Compile(string dir, string file);
+        void Compile(string path);
         void AddLocalLib(string libName);
     }
 }
