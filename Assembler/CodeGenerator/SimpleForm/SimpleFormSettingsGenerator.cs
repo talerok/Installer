@@ -79,6 +79,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         // 
                         // InstallButton
                         // 
+                        this.InstallButton.Enabled = false;
                         this.InstallButton.Location = new System.Drawing.Point(374, 366);
                         this.InstallButton.Name = ""InstallButton"";
                         this.InstallButton.Size = new System.Drawing.Size(98, 23);
@@ -120,7 +121,10 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.Controls.Add(this.pathTextBox);
                         this.Controls.Add(this.InstallProgressBar);
                         this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+                        this.MaximizeBox = false;
+                        this.MinimizeBox = false;
                         this.Name = ""Form1"";
+                        this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
                         this.ResumeLayout(false);
                         this.PerformLayout();
 

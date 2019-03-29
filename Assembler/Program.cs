@@ -13,12 +13,14 @@ using Assembler.InstallConfig;
 using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.WinApp;
 using Assembler.Compiler.Interfaces;
+using Assembler.CodeGenerator.AdvancedForm;
 
 namespace Assembler
 {
     class Program
     {
         private const string _simpleType = "simple";
+        private const string _advancedType = "advanced";
 
         private static bool _checkFrameworkVersion(string ver)
         {
@@ -48,6 +50,17 @@ namespace Assembler
             return Directory.Exists(folder);
         }
 
+        private static void _copyToDir(string sourceDir, string targetDir)
+        {
+            System.IO.Directory.CreateDirectory(targetDir);
+
+            foreach (var file in System.IO.Directory.GetFiles(sourceDir))
+                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+
+            foreach (var directory in System.IO.Directory.GetDirectories(sourceDir))
+                _copyToDir(directory, Path.Combine(targetDir, Path.GetFileName(directory)));
+        }
+
         static void Main(string[] args)
         { 
             var namespaces = new[] {
@@ -57,7 +70,8 @@ namespace Assembler
                     "InstallerLib.Installer.InstallCommand.Registry",
                     "InstallerLib.Installer.InstallCommand.Unpacking",
                     "InstallerLib.Installer.InstallInfo",
-                    "InstallerLib.Installer.InstallCommand.Directory"
+                    "InstallerLib.Installer.InstallCommand.Directory",
+                    "InstallerLib.Installer.InstallCommand.ShortCut"
                 };
 
             try
@@ -80,20 +94,34 @@ namespace Assembler
                 if (!_checkFrameworkVersionExists(config.FrameworkVer))
                     throw new Exception($@"Версия .Net Framework {config.FrameworkVer} не найдена на компьютере");
 
+                Console.WriteLine("Копирование файлов сборки");
+
+                var versionFolderPath = $@"{config.VersionsFolderPath}\{config.Version}";
+
+                if (Directory.Exists(versionFolderPath))
+                    Directory.Delete(versionFolderPath, true);
+
+                _copyToDir(config.BuildPath, versionFolderPath);
+                
+
+                Console.WriteLine($"Генерация кода");
+
                 switch (config.Type)
                 {
                     case _simpleType:
                         var appCodeInfo = new SimpleFormInstallCodeGenerator(config).GetCode();
                         compiler = new WinAppCompiler(config.FrameworkVer, namespaces, appCodeInfo.Code, appCodeInfo.Resources);
                         break;
+                    case _advancedType:
+                        var advCodeInfo = new AdvancedFormInstallCodeGenerator(config).GetCode();
+                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, advCodeInfo.Code, advCodeInfo.Resources);
+                        break;
                     default:
                         throw new Exception("Неизвестный тип инсталятора");
                 }
 
-               
-
-                compiler.AddLocalLib("DotNetZip");
-                compiler.AddLocalLib("InstallerLib");
+                foreach (var lib in Directory.GetFiles("Libs", "*.dll"))
+                    compiler.AddLocalLib(lib);
 
                 Console.WriteLine($"Сборка инсталятора {file}");
                 compiler.Compile(dir, file);

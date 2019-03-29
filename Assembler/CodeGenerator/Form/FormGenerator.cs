@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator.SimpleForm
+namespace Assembler.CodeGenerator.Form
 {
-    class SimpleFormGenerator
+    class FormGenerator
     {
         private List<string> _nameSpaces = new List<string> {
             "System",
@@ -15,14 +15,15 @@ namespace Assembler.CodeGenerator.SimpleForm
             "System.Text.RegularExpressions",
             "System.Collections.Generic",
             "System.Reflection",
-            "System.Windows.Forms"
+            "System.Windows.Forms",
+            "System.Threading"
         };
 
         private string _code;
         private string _rootNameSpace;
         private IDictionary<string, string> _localLibs;
 
-        public SimpleFormGenerator(string rootNameSpace, IEnumerable<string> nameSpaces, IDictionary<string, string> localLibs, string code)
+        public FormGenerator(string rootNameSpace, IEnumerable<string> nameSpaces, IDictionary<string, string> localLibs, string code)
         {
             _localLibs = localLibs;
             _nameSpaces.AddRange(nameSpaces);
@@ -51,7 +52,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                 classBody.AppendLine(libResolveCode.MethodCode);
                 classBody.AppendLine("[STAThread]");
                 classBody.AppendLine(MethodGenerator.Generate(new string[] { "static" }, "void", "Main", new string[] { }, mainBody.ToString()));
-                
+
 
                 res.AppendLine(NameSpaceGenerator.Generate(_rootNameSpace,
                     ClassGenerator.Generate(new string[] { "public", "static" }, "Program", classBody.ToString())));

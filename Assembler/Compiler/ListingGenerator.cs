@@ -38,16 +38,23 @@ namespace Assembler.Compiler
             return res.ToString();
         }
 
-        public static string GenerateCodeLisning(string code)
+        public static string GenerateCodeLisning(string code, bool lineCaptions = true)
         {
             var res = new StringBuilder();
             var lines = code.Split('\n');
             int tabLevel = 0;
             for (var i = 0; i < lines.Length; i++)
             {
+                if (string.IsNullOrEmpty(lines[i]) || string.IsNullOrWhiteSpace(lines[i]))
+                    continue;
+
                 var formLine = lines[i].Replace('\r',' ').Replace('\n', ' ').TrimStart(' ').TrimEnd(' ');
                 tabLevel -= _countCloseBraces(formLine);
-                res.AppendLine($@"{i + 1}{_tabString}{_getTabulation(tabLevel)}{lines[i].TrimStart(' ').TrimEnd(' ')}");
+
+                if(lineCaptions)
+                    res.AppendLine($@"{i + 1}{_tabString}{_getTabulation(tabLevel)}{lines[i].TrimStart(' ').TrimEnd(' ')}");
+                else
+                    res.Append($@"{_getTabulation(tabLevel)}{lines[i].TrimStart(' ').TrimEnd(' ')}");
                 tabLevel += _countOpenBraces(formLine);
 
             }

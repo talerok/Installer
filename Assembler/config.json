@@ -1,25 +1,29 @@
-{
-  "OutputPath": "D:\\InstallTest\\3.exe",
+﻿{
+  "OutputPath": "D:\\InstallTest\\4.exe",
   "FrameworkVer": "3.5",
-  "Type": "simple",
-  "AppName": "Test programm",
+  "Type": "advanced",
+  "AppName": "Test programm 455",
+  "Description": "блаблабла\\nблаблбабла2",
+  "AfterInstallMessage": "блаблабла2",
   "UseDefaultPath": false,
   "DefaultPath": "",
-  "RegistryVersionPath": "SOFTWARE\\TestInstal\\test56712",
-  "Version": "1",
-  "MinVersion": null,
-  "MaxVersion": null,
-  "Commands": [
-    {
-      "CommandName": "copy",
-      "Params": [
-        "testBundle",
-        "",
-        "D:\\InstallTest\\Testing\\1"
-      ]
-    }
-  ],
+  "Version": "4",
+  "ForVersion": "3",
+
+  "BuildPath": "C:\\Users\\akurochkin\\Downloads",
+  "VersionsFolderPath": "Versions",
+
   "StartAfterInstall": [
-    "wybuild-setup.exe"
+    "vs.exe"
+  ],
+  "DesktopShortCuts": [
+   
+  ],
+  "StartMenuShortCuts": [
+    
+  ],
+  "AutoStart": [
+   
   ]
+
 }

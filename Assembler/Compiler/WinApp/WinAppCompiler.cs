@@ -1,4 +1,5 @@
 ﻿using Assembler.CodeGenerator;
+using Assembler.CodeGenerator.Form;
 using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.Interfaces;
 using Microsoft.CodeAnalysis;
@@ -21,7 +22,7 @@ namespace Assembler.Compiler.WinApp
         private Dictionary<string, string> _localLibs = new Dictionary<string, string>();
         private IDictionary<string, byte[]> _resources;
 
-        private const string _rootNameSpace = "ConsoleApp";
+        private const string _rootNameSpace = "WinApp";
 
         public WinAppCompiler(string frameworkVer, string[] namespaces, string code, IDictionary<string, byte[]> resources)
         {
@@ -36,7 +37,6 @@ namespace Assembler.Compiler.WinApp
         }
 
         private static string runtimePath(string frameworkVersion, string libName) => $@"C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v{frameworkVersion}\Profile\Client\{libName}.dll";
-        private static string localRuntimePath(string libName) => $@"{libName}.dll";
 
         private IEnumerable<MetadataReference> _generateReferences() =>
             _frameworkLibs.Concat(_localLibs.Values).Select(x => MetadataReference.CreateFromFile(x));
@@ -53,7 +53,7 @@ namespace Assembler.Compiler.WinApp
 
         public void AddLocalLib(string libName)
         {
-            _localLibs.Add(libName, localRuntimePath(libName));
+            _localLibs.Add(Path.GetFileName(libName).Replace(".dll", ""), libName);
         }
 
         public void AddFrameworkLib(string frameworkVer, string libName)
@@ -91,12 +91,17 @@ namespace Assembler.Compiler.WinApp
         public void Compile(string path, string filename)
         {
 
-            var generator = new SimpleFormGenerator(_rootNameSpace, _namespaces, _localLibs, _code);
+            var generator = new FormGenerator(_rootNameSpace, _namespaces, _localLibs, _code);
             var resources = _generateResources(_generateLocalLibsResources(_localLibs).Concat(_resources).ToDictionary(x => x.Key, x => x.Value));
 
             try
             {
                 var code = generator.Generate();
+
+                if (File.Exists("listing.txt"))
+                    File.Delete("listing.txt");
+
+                File.WriteAllText("listing.txt", ListingGenerator.GenerateCodeLisning(code, false));
 
                 var parsedSyntaxTree = _parse(code, "", CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp7));
                 var compilation

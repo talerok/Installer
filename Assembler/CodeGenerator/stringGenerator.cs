@@ -6,9 +6,12 @@ namespace Assembler.CodeGenerator
 {
     class StringGenerator
     {
-        public static string Generate(string body)
+        public static string Generate(string body, bool withDot = true)
         {
-            return $@"@""{body}""";
+            if(withDot)
+                return $@"@""{body}""";
+            else
+                return $@"""{body}""";
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Assembler.CodeGenerator.InstallCodeGenerators;
+﻿using Assembler.CodeGenerator.Form;
+using Assembler.CodeGenerator.InstallCodeGenerators;
 using Assembler.InstallConfig;
 using System;
 using System.Collections.Generic;
@@ -15,39 +16,6 @@ namespace Assembler.CodeGenerator.SimpleForm
 
         private bool _checkStartAfterInstall() => _config.StartAfterInstall.Any();
 
-        private string _generateAdminCheckMethod()
-        {
-            var res = new StringBuilder();
-            res.AppendLine(ObjectGenerator.Generate("adminCheck", "AdminCheck"));
-            res.AppendLine($@"if(!adminCheck.Check())");
-            res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("Инсталятор должен быть запущен от имени администратора")));
-            return MethodGenerator.Generate(new string[] { "private" }, "void", "_checkAdmin", new string[] { }, res.ToString());
-        }
-
-        private string _generateVersionCheckMethod()
-        {
-            var res = new StringBuilder();
-            res.AppendLine(ObjectGenerator.Generate("versionCheck", "GetVersion", StringGenerator.Generate(_config.RegistryVersionPath)));
-            res.AppendLine($@"var currentVersion = versionCheck.GetInfo();");
-            if (string.IsNullOrEmpty(_config.MinVersion) && string.IsNullOrEmpty(_config.MaxVersion))
-            {
-                res.AppendLine($@"if(currentVersion != null && currentVersion.CompareTo(""{_config.Version}"") != -1)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установленна более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {_config.Version})"""));
-            }
-            if (!string.IsNullOrEmpty(_config.MinVersion))
-            {
-                res.AppendLine($@"if(currentVersion.CompareTo({StringGenerator.Generate(_config.MinVersion)}) == -1)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Не подходящая версия программы (текущая версия: "" + currentVersion + "", минимальная возможная версия: {_config.MinVersion})"""));
-            }
-            if (!string.IsNullOrEmpty(_config.MaxVersion))
-            {
-                res.AppendLine($@"if(currentVersion.CompareTo({StringGenerator.Generate(_config.MaxVersion)}) == 1)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Не подходящая версия программы (текущая версия: "" + currentVersion + "", максимальная возможная версия: {_config.MaxVersion})"""));
-            }
-
-            return MethodGenerator.Generate(new string[] { "private" }, "void", "_checkVersion", new string[] { }, res.ToString());
-        }
-
 
         private string _generatePrepareFormMethod()
         {
@@ -55,30 +23,36 @@ namespace Assembler.CodeGenerator.SimpleForm
             var formName = StringGenerator.Generate($"Установщик {_config.AppName} Version {_config.Version}");
             res.AppendLine($"this.Text = {formName};");
 
-            res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(_config.RegistryVersionPath)));
+            res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(_config.AppName)));
             res.AppendLine($@"var installPath = pathCheck.GetInfo();");
 
             if (!_checkStartAfterInstall())
                 res.AppendLine("StartProgramCheckBox.Visible = false;");
 
-            if (!string.IsNullOrEmpty(_config.MinVersion) && !string.IsNullOrEmpty(_config.MaxVersion))
+
+
+            if (!string.IsNullOrEmpty(_config.ForVersion))
             {
                 res.AppendLine(@"if (installPath == null)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
                 res.AppendLine("pathTextBox.Text = installPath;");
                 res.AppendLine("SelectPathButton.Enabled = false;");
+                res.AppendLine("InstallButton.Enabled = true;");
             }
             else
             {
-                if(_config.UseDefaultPath)
+                if (_config.UseDefaultPath)
                     res.AppendLine("SelectPathButton.Enabled = false;");
 
                 res.AppendLine(@"if (installPath == null) {");
                 res.AppendLine($"pathTextBox.Text = {StringGenerator.Generate(_config.DefaultPath)};");
+                if(!String.IsNullOrEmpty(_config.DefaultPath))
+                    res.AppendLine("InstallButton.Enabled = true;");
+
                 res.AppendLine("} else {");
                 res.AppendLine("pathTextBox.Text = installPath;");
+                res.AppendLine("InstallButton.Enabled = true;");
                 res.AppendLine("SelectPathButton.Enabled = false;");
-                res.AppendLine("_clearDir = true;");
                 res.AppendLine("}");
             }
             return MethodGenerator.Generate(new string[] { "private" }, "void", "_preapareForm", new string[] { }, res.ToString());
@@ -88,13 +62,17 @@ namespace Assembler.CodeGenerator.SimpleForm
         {
             var tryBody = new StringBuilder();
             tryBody.AppendLine("_checkAdmin();");
-            tryBody.AppendLine("_checkVersion();");
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("_preapareForm();");
+            tryBody.AppendLine("_checkVersion();");
             tryBody.AppendLine("InstallProcessEventHandler += _installEvent;");
+
+            tryBody.AppendLine(_generateInstallProccesTextPring(_config.Description, true));
+          
             var catchBody = new StringBuilder();
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(-1);");
+
 
             var res = new StringBuilder();
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
@@ -107,15 +85,17 @@ namespace Assembler.CodeGenerator.SimpleForm
         {
             var res = new StringBuilder();
             res.AppendLine("using (var dialog = new FolderBrowserDialog())");
-            res.AppendLine("if (dialog.ShowDialog() == DialogResult.OK)");
+            res.AppendLine("if (dialog.ShowDialog() == DialogResult.OK) {");
             res.AppendLine("pathTextBox.Text = dialog.SelectedPath;");
+            res.AppendLine("InstallButton.Enabled = true;");
+            res.AppendLine("}");
             return MethodGenerator.Generate(new string[] { "private" }, "void", "SelectPathButton_Click", new string[] { "object sender", "EventArgs e" }, res.ToString());
         }
 
         private string _generateInstallButtonClickMethod(IDictionary<string, byte[]> resources)
         {
             var code = new StringBuilder("_blockButtons();");
-            code.AppendLine(InstallProcessGenerator.Generate(_config, resources, "pathTextBox.Text", "_clearDir"));
+            code.AppendLine(InstallProcessGenerator.Generate(_config, resources, "pathTextBox.Text", "true", "true", "true", "InstallProcessEventHandler"));
             code.AppendLine("CloseButton.Enabled = true;");
 
             return MethodGenerator.Generate(new string[] { "private" }, "void", "InstallButton_Click", new string[] { "object sender", "EventArgs e" }, code.ToString());
@@ -136,8 +116,8 @@ namespace Assembler.CodeGenerator.SimpleForm
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.SuccesInstall:");
-            body.AppendLine(_generateInstallProccesTextPring("Установка прошла успешно", true));
-            body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate("Установка прошла успешно")));
+            body.AppendLine(_generateInstallProccesTextPring(_config.AfterInstallMessage, true));
+            body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate(_config.AfterInstallMessage)));
             body.AppendLine("_startProgram();");
             body.AppendLine("break;");
 
@@ -146,16 +126,12 @@ namespace Assembler.CodeGenerator.SimpleForm
             body.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "(string)args.Info"));
             body.AppendLine("break;");
 
-            body.AppendLine("case InstallEventType.SetProgresMaxValue:");
+            body.AppendLine("case InstallEventType.SetProgressMaxValue:");
             body.AppendLine("InstallProgressBar.Maximum = (int)args.Info;");
             body.AppendLine("break;");
 
-            body.AppendLine("case InstallEventType.IncreaseProgress:");
-            body.AppendLine("InstallProgressBar.Value++;");
-            body.AppendLine("break;");
-
-            body.AppendLine("case InstallEventType.DecreaseProgress:");
-            body.AppendLine("InstallProgressBar.Value--;");
+            body.AppendLine("case InstallEventType.SetProgress:");
+            body.AppendLine("InstallProgressBar.Value = (int)args.Info;");
             body.AppendLine("break;");
             body.AppendLine("}");
             return InstallProcessGenerator.GenerateEventMethod(new string[] { "private" }, "_installEvent", "args", body.ToString());
@@ -201,13 +177,12 @@ namespace Assembler.CodeGenerator.SimpleForm
 
                 var formClassBody = new StringBuilder();
 
-                formClassBody.AppendLine("private bool _clearDir = false;");
                 formClassBody.AppendLine(SimpleFormSettingsGenerator.Generate());
                 formClassBody.AppendLine(InstallProcessGenerator.GenerateAuxiliaryCode("InstallProcessEventHandler"));
                 formClassBody.AppendLine(_generateInstallEventMethod());
                 formClassBody.AppendLine(_generatePrepareFormMethod());
-                formClassBody.AppendLine(_generateVersionCheckMethod());
-                formClassBody.AppendLine(_generateAdminCheckMethod());
+                formClassBody.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_versionCheck", _config));
+                formClassBody.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(_config, "_checkAdmin"));
                 formClassBody.AppendLine(_generateFormConstructor());
                 formClassBody.AppendLine(_generateSelectPathButtonClickMethod());
                 formClassBody.AppendLine(_generateCloseButtonClickMethod());

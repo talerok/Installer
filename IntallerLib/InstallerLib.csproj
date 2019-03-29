@@ -40,6 +40,10 @@
     <Reference Include="DotNetZip, Version=1.12.0.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.12.0\lib\net20\DotNetZip.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net20\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -48,21 +52,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Installer\Helpers\ConfigFile.cs" />
+    <Compile Include="Installer\Helpers\ShortCut.cs" />
     <Compile Include="Installer\InstallCheck\AdminCheck.cs" />
     <Compile Include="Installer\InstallCheck\Interfaces\IInstallCheck.cs" />
-    <Compile Include="Installer\InstallCheck\VersionCheck.cs" />
-    <Compile Include="Installer\InstallCommand\Directory\ClearDirectory.cs" />
     <Compile Include="Installer\InstallCommand\InstallException.cs" />
     <Compile Include="Installer\InstallCommand\Intefaces\IInstallCommand.cs" />
-    <Compile Include="Installer\InstallCommand\Registry\AutoStart.cs" />
+    <Compile Include="Installer\InstallCommand\ShortCut\AutoStart.cs" />
     <Compile Include="Installer\Helpers\OSInfo.cs" />
     <Compile Include="Installer\Helpers\RegistryExtensions.cs" />
     <Compile Include="Installer\InstallCommand\Registry\RegValueKind.cs" />
-    <Compile Include="Installer\InstallCommand\Registry\SetPath.cs" />
-    <Compile Include="Installer\InstallCommand\Registry\SetVersion.cs" />
+    <Compile Include="Installer\InstallCommand\Directory\SetPath.cs" />
+    <Compile Include="Installer\InstallCommand\Directory\SetVersion.cs" />
     <Compile Include="Installer\InstallCommand\Registry\SimpleRegisterCommand.cs" />
+    <Compile Include="Installer\InstallCommand\ShortCut\Desktop.cs" />
+    <Compile Include="Installer\InstallCommand\ShortCut\ShortCutInfo.cs" />
+    <Compile Include="Installer\InstallCommand\ShortCut\ShortCutsCommand.cs" />
+    <Compile Include="Installer\InstallCommand\ShortCut\StartMenu.cs" />
     <Compile Include="Installer\InstallCommand\Unpacking\Replace.cs" />
-    <Compile Include="Installer\InstallCommand\Unpacking\ZipBundleUnpacker.cs" />
+    <Compile Include="Installer\InstallCommand\Unpacking\Unpack.cs" />
     <Compile Include="Installer\InstallInfo\GetPath.cs" />
     <Compile Include="Installer\InstallInfo\GetVersion.cs" />
     <Compile Include="Installer\InstallInfo\Interfaces\IInstallInfo.cs" />

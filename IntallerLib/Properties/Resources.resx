@@ -160,7 +160,7 @@
     <value>Ошибка чтения конфигурации установки</value>
   </data>
   <data name="ZipBundleUnpackerBundleExtractExceptionMessage" xml:space="preserve">
-    <value>Ошибка разархивирования бандла {0} в папку {1}</value>
+    <value>Ошибка разархивирования в папку {0}</value>
   </data>
   <data name="ZipBundleUnpackerBundleNameExceptionMessage" xml:space="preserve">
     <value>Некоректное имя бандла</value>
@@ -169,10 +169,10 @@
     <value>Ошибка создания папки {0}</value>
   </data>
   <data name="ZipBundleUnpackerDataExceptionMessage" xml:space="preserve">
-    <value>Отсутствует данные бандла {0}</value>
+    <value>Отсутствует данные архива</value>
   </data>
   <data name="ZipBundleUnpackerDesription" xml:space="preserve">
-    <value>Распаковка архива бандла {0} размером {1} байт в деректорию {2}</value>
+    <value>Распаковка архива размером {0} байт в папку {1}</value>
   </data>
   <data name="SetVersionDescription" xml:space="preserve">
     <value>Обновление значения версии программы {0}</value>
@@ -193,15 +193,39 @@
     <value>Ошибка очистки папки {0}</value>
   </data>
   <data name="ZipBundleUnpackerUndoException" xml:space="preserve">
-    <value>Ошибка отката измененй бандла {0} ({1})</value>
+    <value>Ошибка отката измененй архива ({0})</value>
   </data>
   <data name="SimpleRegisterCommandUndoException" xml:space="preserve">
-    <value>Ошибка отката изменений значения реестра {0} по пути {2} ({3})</value>
+    <value>Ошибка отката изменений значения реестра {0} по пути {1} ({2})</value>
   </data>
   <data name="ReplaceDescription" xml:space="preserve">
-    <value>Обновление папки {0} (бандл: {1})</value>
+    <value>Обновление папки {0}</value>
   </data>
   <data name="ReplaceException" xml:space="preserve">
-    <value>Ошибка обновление папки {0} (бандл: {1}) ({2})</value>
+    <value>Ошибка обновление папки {0} ({1})</value>
+  </data>
+  <data name="ShortLinkDescription" xml:space="preserve">
+    <value>Создание ярлыка {0}</value>
+  </data>
+  <data name="ShortLinkException" xml:space="preserve">
+    <value>Ошибка создания ярлыка {0}</value>
+  </data>
+  <data name="ConfigFileNotFound" xml:space="preserve">
+    <value>Файл конфигурации установки не найден</value>
+  </data>
+  <data name="ConfigWriteException" xml:space="preserve">
+    <value>Ошибка обновления файла конфигурации устанровки</value>
+  </data>
+  <data name="DeleteFile" xml:space="preserve">
+    <value>Удаление файла {0}</value>
+  </data>
+  <data name="SetPathUndo" xml:space="preserve">
+    <value>Востановление установочного пути программы</value>
+  </data>
+  <data name="SetVersionUndo" xml:space="preserve">
+    <value>Востановление версии программы </value>
+  </data>
+  <data name="ShortCutUndo" xml:space="preserve">
+    <value>Востановление ярлыка {0}</value>
   </data>
 </root>

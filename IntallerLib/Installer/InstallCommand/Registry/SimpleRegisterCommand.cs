@@ -11,6 +11,8 @@ namespace InstallerLib.Installer.InstallCommand.Registry
     public class SimpleRegisterCommand : IInstallCommand
     {
 
+        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+
         private string _path;
         private string _value;
         private string _name;
@@ -18,14 +20,6 @@ namespace InstallerLib.Installer.InstallCommand.Registry
 
         private object _backupValue;
         private RegistryValueKind _backupRegistryValueKind;
-
-        public string Description
-        {
-            get
-            {
-                return String.Format(InstallerLib.Properties.Resources.SimpleRegisterCommandDescription, _value, _valueKind, _path);
-            }
-        }
 
         public SimpleRegisterCommand(string path, string name, string value, RegValueKind valueKind)
         {
@@ -94,6 +88,9 @@ namespace InstallerLib.Installer.InstallCommand.Registry
 
         public void Do()
         {
+
+            InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(InstallerLib.Properties.Resources.SimpleRegisterCommandDescription, _value, _valueKind, _path), 0));
+
             var val = _converValue(_value, _valueKind);
             var keyKind = _convertValueKind(_valueKind);
 
@@ -120,6 +117,8 @@ namespace InstallerLib.Installer.InstallCommand.Registry
 
                     curDir.SetValue(_name, val, keyKind);              
                 }
+
+                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Значение записано в реестр", 100));
             }
             catch
             {
@@ -131,23 +130,26 @@ namespace InstallerLib.Installer.InstallCommand.Registry
         {
             try
             {
+                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Востановление записи в реестре", 100));
+
                 RegistryHiveType registryHiveType = OSInfo.IsOS64Bit() ? RegistryHiveType.X64 : RegistryHiveType.X86;
                 using (var registry = OpenBaseKey(RegistryHive.LocalMachine, registryHiveType))
                 {
                     var subKey = registry.OpenSubKey(_path);
-                    if (subKey == null)
-                        return;
-
-                    if (_backupValue == null)
+                    if (subKey != null)
                     {
-                        if (subKey.GetValue(_name) != null)
-                            subKey.DeleteValue(_name);
-                    }
-                    else
-                    {
-                        subKey.SetValue(_name, _backupValue, _backupRegistryValueKind);
+                        if (_backupValue == null)
+                        {
+                            if (subKey.GetValue(_name) != null)
+                                subKey.DeleteValue(_name);
+                        }
+                        else
+                        {
+                            subKey.SetValue(_name, _backupValue, _backupRegistryValueKind);
+                        }
                     }
                 }
+                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Запись в реестре востановлена", 0));
             }
             catch (Exception ex)
             {

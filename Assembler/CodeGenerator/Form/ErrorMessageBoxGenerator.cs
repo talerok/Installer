@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator.SimpleForm
+namespace Assembler.CodeGenerator.Form
 {
     static class ErrorMessageBoxGenerator
     {

@@ -8,28 +8,23 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 {
     static class InstallProcessGenerator
     {
-        private static string _generateCommandCode(CommandConfig commandConfig, ref IDictionary<string, byte[]> resources)
-        {
-            if (commandConfig == null || commandConfig.Params == null)
-                throw new ArgumentNullException("incorrect config");
-
-            var res = InstallCommandGenerator.Generate(commandConfig.CommandName, commandConfig.Params, ref resources);
-
-            if (res == null)
-                throw new ArgumentException("incorrect command");
-
-            return res;
-        }
-
-        private static string _generateEventInvoke(string EventType, string message = null, bool quotes = false)
+       
+        private static string _generateEventInvoke(string EventHandler, string EventType, string message = null, bool quotes = false)
         {
             if (message == null)
-                return $"InstallProcessEventHandler.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}));";
+                return $"{EventHandler}.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}));";
             else
                 if (!quotes)
-                    return $"InstallProcessEventHandler.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}, {message}));";
+                    return $"{EventHandler}.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}, {message}));";
                 else
-                    return $"InstallProcessEventHandler.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}, {StringGenerator.Generate(message)}));";
+                    return $"{EventHandler}.Invoke(this, new InstallProcessEventArgs(InstallEventType.{EventType}, {StringGenerator.Generate(message)}));";
+        }
+
+        private static string _generateShortCutCommand(Config config, IEnumerable<ShortCutConfig> shortCuts, string commandName)
+        {
+            var listBody = shortCuts.Select(x => ObjectGenerator.Generate(null, "ShortCutInfo", StringGenerator.Generate(x.Name), StringGenerator.Generate(x.FilePath)));
+            var list = ListCodeGenerator.Generate(null, "ShortCutInfo", listBody);
+            return ObjectGenerator.Generate(null, commandName, StringGenerator.Generate(config.AppName), list);
         }
 
         public static string GenerateAuxiliaryCode(string eventHandlerName)
@@ -38,11 +33,11 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                     {
                         Message,
                         Error,
-                        SetProgresMaxValue,
-                        IncreaseProgress,
-                        DecreaseProgress,
+                        SetProgress,
+                        SetProgressMaxValue,
                         SuccesInstall,
-                        FailInstall
+                        FailInstall,
+                        CanceledInstall
                     }
 
                     private class InstallProcessEventArgs : EventArgs
@@ -70,61 +65,132 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             return MethodGenerator.Generate(modifiers, "void", methodName, new string[] { "object sender", $"InstallProcessEventArgs {argsName}" }, body);
         }
 
-        public static string Generate(Config config, IDictionary<string,byte[]> resources, string installPathCode, string clearDirCode)
+        public static string Generate(Config config, IDictionary<string,byte[]> resources, string installPathCode, string desktopShortCutsCode, string startMenuShortCutsCode, string startUpCode, string eventHandler, string stopInstallCode = null)
         {
             var code = new StringBuilder();
             code.AppendLine($@"var installPath = {installPathCode};");
 
             var commandsCode = new List<string>();
-            commandsCode.AddRange(config.Commands.Select(x => _generateCommandCode(x, ref resources)));
-            commandsCode.Add(ObjectGenerator.Generate(null, "SetVersion", StringGenerator.Generate(config.Version), StringGenerator.Generate(config.RegistryVersionPath)));
-            commandsCode.Add(ObjectGenerator.Generate(null, "SetPath", "installPath", StringGenerator.Generate(config.RegistryVersionPath)));
+
+            if (!string.IsNullOrEmpty(stopInstallCode))
+                commandsCode.Add(InstallCommandGenerator.Generate(config, ref resources, $"() => {stopInstallCode}" )); // () => {stopInstallCode} - функция отмены разархивирования
+            else
+                commandsCode.Add(InstallCommandGenerator.Generate(config, ref resources, $"null"));
+            commandsCode.Add(ObjectGenerator.Generate(null, "SetVersion", StringGenerator.Generate(config.Version), "installPath"));
+
+
+            var undoBody = ForGenerator.Generate("", "step >= 0", "step--", $"commands[step].Undo();");
 
             var forBody = new StringBuilder();
             forBody.AppendLine("var command = commands[step];");
-            forBody.AppendLine(_generateEventInvoke("Message", "command.Description"));
-
-            forBody.AppendLine(_generateEventInvoke("IncreaseProgress"));
+            forBody.AppendLine("command.InstallProgressEventHandler += (o,a) => {"); // Подписываемся на события комманд установки
+            forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "a.Message", false));
+            forBody.AppendLine("if(step == 0)"); 
+            forBody.AppendLine(_generateEventInvoke(eventHandler, "SetProgress", "(int)(a.Progress)", false)); // учитываем в прогрессе только распаковку (так проще)
+            forBody.AppendLine("};"); 
             forBody.AppendLine("command.Do();");
 
+            if (!string.IsNullOrEmpty(stopInstallCode)) // Отмена установки
+            {
+                forBody.AppendLine($"if({stopInstallCode}) {{");
+                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Отмена установки", true));
+                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Откат изменений", true));
+                forBody.AppendLine(undoBody);
+                forBody.AppendLine(_generateEventInvoke(eventHandler, "CanceledInstall"));
+                forBody.AppendLine("return;");
+                forBody.AppendLine("}");
+            }
             var foreachBody = "command.Finish();";
 
             code.AppendLine("List<IInstallCommand> commands = null;");
             code.AppendLine("int step = 0;");
-            code.AppendLine(_generateEventInvoke("Message", "Запуск установки", true));
+            code.AppendLine(_generateEventInvoke(eventHandler, "Message", "Запуск установки", true));
 
             var tryBody = new StringBuilder();
             tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
 
-            tryBody.AppendLine($"if({clearDirCode})");
-            tryBody.AppendLine($@"commands.Insert(0, {ObjectGenerator.Generate(null, "ClearDirectory", "installPath")});");
+            tryBody.AppendLine(ObjectGenerator.Generate("pCheck", "GetPath", StringGenerator.Generate(config.AppName)));
+            tryBody.AppendLine("if(pCheck.GetInfo() == null)");
+            tryBody.AppendLine($@"commands.Add({ObjectGenerator.Generate(null, "SetPath", StringGenerator.Generate(config.AppName), "installPath")});");
 
-            tryBody.AppendLine(_generateEventInvoke("SetProgresMaxValue", "commands.Count"));
+            tryBody.AppendLine($"if({desktopShortCutsCode})");
+            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "Desktop")});");
+
+            tryBody.AppendLine($"if({startMenuShortCutsCode})");
+            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "StartMenu")});");
+
+            tryBody.AppendLine($"if({startUpCode})");
+            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "AutoStart")});");
 
             tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
-            tryBody.AppendLine(_generateEventInvoke("Message", "Финализация установки", true));
+            tryBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Финализация установки", true));
             tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));
-            tryBody.AppendLine(_generateEventInvoke("SuccesInstall"));
+            tryBody.AppendLine(_generateEventInvoke(eventHandler, "SuccesInstall"));
 
             code.AppendLine(TryGenerator.Generate(tryBody.ToString()));
 
             var InstallCatchBody = new StringBuilder();
 
 
-            InstallCatchBody.AppendLine(_generateEventInvoke("Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-            InstallCatchBody.AppendLine(_generateEventInvoke("Error", "Выполняю откат установки", true));
-            InstallCatchBody.AppendLine(ForGenerator.Generate("", "step >= 0", "step--", $"commands[step].Undo();\n{_generateEventInvoke("DecreaseProgress")};"));
-            InstallCatchBody.AppendLine(_generateEventInvoke("Error", "Откат выполнен", true));
-            InstallCatchBody.AppendLine(_generateEventInvoke("FailInstall", "ex.Message"));
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", "Выполняю откат установки", true));
+            InstallCatchBody.AppendLine(undoBody);
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", "Откат выполнен", true));
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "FailInstall", "ex.Message"));
 
             code.AppendLine(CatchGenerator.Generate("InstallException", "ex", InstallCatchBody.ToString()));
 
             var catchBody = new StringBuilder();
-            catchBody.AppendLine(_generateEventInvoke("Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-            catchBody.AppendLine(_generateEventInvoke("FailInstall", "ex.Message"));
+            catchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
+            catchBody.AppendLine(_generateEventInvoke(eventHandler, "FailInstall", "ex.Message"));
             code.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
 
             return code.ToString();
         }
+
+        public static string GenerateAdminCheckMethod(Config config, string methodName)
+        {
+            var body = new StringBuilder();
+
+            body.AppendLine(ObjectGenerator.Generate("adminCheck", "AdminCheck"));
+            body.AppendLine($@"if(!adminCheck.Check())");
+            body.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("Инсталятор должен быть запущен от имени администратора")));
+
+            var res = new StringBuilder();
+
+            if (config.AutoStart.Any() || config.DesktopShortCuts.Any() || config.StartMenuShortCuts.Any()) // Нужны права админа чтобы создавать ярлыки
+            {
+                res.AppendLine(body.ToString());
+            }
+            else
+            {
+                res.AppendLine(ObjectGenerator.Generate("pCheck", "GetPath", StringGenerator.Generate(config.AppName))); // Нужны права админа при первой установки
+                res.AppendLine("if(pCheck.GetInfo() == null) {"); // т.е если нет информации по пути установки = программа не была установлена
+                res.AppendLine(body.ToString());
+                res.AppendLine("}");
+            }
+           
+            return MethodGenerator.Generate(new string[] { "private" }, "void", methodName, new string[] { }, res.ToString());
+        }
+
+        public static string GenerateVersionCheckMethod(string methodName, Config config)
+        {
+            var res = new StringBuilder();
+            res.AppendLine(ObjectGenerator.Generate("versionCheck", "GetVersion", StringGenerator.Generate(config.AppName)));
+            res.AppendLine($@"var currentVersion = versionCheck.GetInfo();");
+            if (string.IsNullOrEmpty(config.ForVersion))
+            {
+                res.AppendLine($@"if(currentVersion != null && currentVersion.CompareTo(""{config.Version}"") != -1)");
+                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {config.Version})"""));
+            }
+            else
+            {
+                res.AppendLine($@"if(currentVersion == null || currentVersion != {StringGenerator.Generate(config.ForVersion)})");
+                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена неподходящая версия программы (текущая версия: "" + (currentVersion != null ? currentVersion : ""отсутствует"") + "", версия установщика: {config.ForVersion})"""));
+            }
+           
+            return MethodGenerator.Generate(new string[] { "private" }, "void", "_checkVersion", new string[] { }, res.ToString());
+        }
+
     }
 }

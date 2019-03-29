@@ -124,11 +124,38 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Файл конфигурации установки не найден.
+        /// </summary>
+        internal static string ConfigFileNotFound {
+            get {
+                return ResourceManager.GetString("ConfigFileNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Ошибка чтения конфигурации установки.
         /// </summary>
         internal static string ConfigReadFail {
             get {
                 return ResourceManager.GetString("ConfigReadFail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка обновления файла конфигурации устанровки.
+        /// </summary>
+        internal static string ConfigWriteException {
+            get {
+                return ResourceManager.GetString("ConfigWriteException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Удаление файла {0}.
+        /// </summary>
+        internal static string DeleteFile {
+            get {
+                return ResourceManager.GetString("DeleteFile", resourceCulture);
             }
         }
         
@@ -169,7 +196,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновление папки {0} (бандл: {1}).
+        ///   Ищет локализованную строку, похожую на Обновление папки {0}.
         /// </summary>
         internal static string ReplaceDescription {
             get {
@@ -178,7 +205,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка обновление папки {0} (бандл: {1}) ({2}).
+        ///   Ищет локализованную строку, похожую на Ошибка обновление папки {0} ({1}).
         /// </summary>
         internal static string ReplaceException {
             get {
@@ -205,6 +232,15 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Востановление установочного пути программы.
+        /// </summary>
+        internal static string SetPathUndo {
+            get {
+                return ResourceManager.GetString("SetPathUndo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Обновление значения версии программы {0}.
         /// </summary>
         internal static string SetVersionDescription {
@@ -219,6 +255,42 @@ namespace InstallerLib.Properties {
         internal static string SetVersionException {
             get {
                 return ResourceManager.GetString("SetVersionException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Востановление версии программы .
+        /// </summary>
+        internal static string SetVersionUndo {
+            get {
+                return ResourceManager.GetString("SetVersionUndo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Востановление ярлыка {0}.
+        /// </summary>
+        internal static string ShortCutUndo {
+            get {
+                return ResourceManager.GetString("ShortCutUndo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Создание ярлыка {0}.
+        /// </summary>
+        internal static string ShortLinkDescription {
+            get {
+                return ResourceManager.GetString("ShortLinkDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ошибка создания ярлыка {0}.
+        /// </summary>
+        internal static string ShortLinkException {
+            get {
+                return ResourceManager.GetString("ShortLinkException", resourceCulture);
             }
         }
         
@@ -250,7 +322,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка отката изменений значения реестра {0} по пути {2} ({3}).
+        ///   Ищет локализованную строку, похожую на Ошибка отката изменений значения реестра {0} по пути {1} ({2}).
         /// </summary>
         internal static string SimpleRegisterCommandUndoException {
             get {
@@ -268,7 +340,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка разархивирования бандла {0} в папку {1}.
+        ///   Ищет локализованную строку, похожую на Ошибка разархивирования в папку {0}.
         /// </summary>
         internal static string ZipBundleUnpackerBundleExtractExceptionMessage {
             get {
@@ -295,7 +367,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отсутствует данные бандла {0}.
+        ///   Ищет локализованную строку, похожую на Отсутствует данные архива.
         /// </summary>
         internal static string ZipBundleUnpackerDataExceptionMessage {
             get {
@@ -304,7 +376,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Распаковка архива бандла {0} размером {1} байт в деректорию {2}.
+        ///   Ищет локализованную строку, похожую на Распаковка архива размером {0} байт в папку {1}.
         /// </summary>
         internal static string ZipBundleUnpackerDesription {
             get {
@@ -313,7 +385,7 @@ namespace InstallerLib.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка отката измененй бандла {0} ({1}).
+        ///   Ищет локализованную строку, похожую на Ошибка отката измененй архива ({0}).
         /// </summary>
         internal static string ZipBundleUnpackerUndoException {
             get {

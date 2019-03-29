@@ -3,6 +3,7 @@ using InstallerLib.Installer.InstallInfo.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using static InstallerLib.Installer.Helpers.RegistryExtensions;
@@ -11,21 +12,20 @@ namespace InstallerLib.Installer.InstallInfo
 {
     public class GetPath : IInstallInfo<string>
     {
-        private string _path;
+        private string _appName;
 
-        public GetPath(string path)
+        public GetPath(string appName)
         {
-            _path = path;
+            _appName = appName;
         }
 
         public string GetInfo()
         {
-            RegistryHiveType registryHiveType = OSInfo.IsOS64Bit() ? RegistryHiveType.X64 : RegistryHiveType.X86;
-            using (var registry = OpenBaseKey(RegistryHive.LocalMachine, registryHiveType).OpenSubKey(_path, false))
-                if (registry == null)
-                    return null;
-                else
-                    return registry.GetValue("Path").ToString();
+            var config = new ConfigFileManager(_appName).Read();
+            if (config == null)
+                return null;
+
+            return config.Path;
         }
     }
 }

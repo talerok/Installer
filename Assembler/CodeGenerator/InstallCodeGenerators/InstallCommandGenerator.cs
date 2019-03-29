@@ -1,4 +1,5 @@
-﻿using Assembler.Substitute;
+﻿using Assembler.InstallConfig;
+using Assembler.Substitute;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,14 +16,14 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
         private const string _copyCommandName = "copy";
         private const string _substituteCommandName = "substitute";
 
-        private static string _generateUnpackCommand(string bundleName, string path)
+        private static string _generateUnpackCommand(string stopCode)
         {
             return ObjectGenerator.Generate(
                             null,
-                            "ZipBundleUnpacker",
-                            StringGenerator.Generate(bundleName),
-                            $@"installPath + {StringGenerator.Generate($@"\{path}")}",
-                            $@"(byte[])_getResxByName({StringGenerator.Generate(bundleName)})");
+                            "Unpack",
+                            $@"installPath",
+                            $@"(byte[])_getResxByName({StringGenerator.Generate("archive")})",
+                            stopCode);
         }
 
         private static string _generateDeletedFilesList(IEnumerable<Assembler.Substitute.FileInfo> info)
@@ -30,84 +31,62 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             return ListCodeGenerator.Generate(null, "string", info.Where(x => x.Status == FileStatus.Deleted).Select(x => StringGenerator.Generate(x.Path)));
         }
 
-        private static string _generateReplaceCommand(string bundleName, string path, IEnumerable<Assembler.Substitute.FileInfo> info)
+        private static string _generateReplaceCommand(string stopCode, IEnumerable<Assembler.Substitute.FileInfo> info)
         {
             return ObjectGenerator.Generate(
                             null,
                             "Replace",
-                            StringGenerator.Generate(bundleName),
-                            $@"installPath + {StringGenerator.Generate($@"\{path}")}",
+                            $@"installPath",
                             _generateDeletedFilesList(info),
-                            $@"(byte[])_getResxByName({StringGenerator.Generate(bundleName)})");
+                            $@"(byte[])_getResxByName({StringGenerator.Generate("archive")})",
+                            stopCode);
         }
 
-        public static string Generate(string commandName, string[] commandParams, ref IDictionary<string, byte[]> resources)
+        public static string Generate(Config config, ref IDictionary<string, byte[]> resources, string stopCode)
         {
-            switch (commandName)
+            if (string.IsNullOrEmpty(config.ForVersion))
             {
-                case _appStartCommandName:
-                    if (commandParams.Length < 2)
-                        return null;
-                    return ObjectGenerator.Generate(null, "AutoStart", StringGenerator.Generate(commandParams[0]), StringGenerator.Generate(commandParams[1]));
-                case _registryCommandName:
-                    if (commandParams.Length < 4)
-                        return null;
-                    return ObjectGenerator.Generate(null, "SimpleRegisterCommand", StringGenerator.Generate(commandParams[0]), StringGenerator.Generate(commandParams[1]), StringGenerator.Generate(commandParams[2]), $"RegValueKind.{commandParams[3]}");
-                case _zipUnpackingCommnadName:
-                    if (commandParams.Length < 3)
-                        return null;
-                    var data = File.ReadAllBytes(commandParams[2]);
-                    resources.Add(commandParams[0], data);
-                    return _generateUnpackCommand(commandParams[0], commandParams[1]);
-                case _copyCommandName:
-                    if (commandParams.Length < 3)
-                        return null; 
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                            archive.CreateEntryFromDirectory(commandParams[2]);
+                using (var memoryStream = new MemoryStream())
+                {
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                        archive.CreateEntryFromDirectory(config.BuildPath);
 
-                        resources.Add(commandParams[0], memoryStream.ToArray());
-                        return _generateUnpackCommand(commandParams[0], commandParams[1]);
+                    resources.Add("archive", memoryStream.ToArray());
+                }
+
+                return _generateUnpackCommand(stopCode);
+            }
+            else
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    if (Directory.Exists("buffer"))
+                        Directory.Delete("buffer", true);
+                    Directory.CreateDirectory("buffer");
+
+                    var prevVersionFolder = $@"{config.VersionsFolderPath}\{config.ForVersion}";
+                    if (!Directory.Exists(prevVersionFolder))
+                        throw new CodeGeneratorException($"Не найдена папка версии {config.ForVersion} ({prevVersionFolder})");
+
+                    var filesInfo = FoldersSubstitute.Substitute(prevVersionFolder, config.BuildPath);
+
+                    foreach (var fileInfo in filesInfo.Where(x => x.Status == FileStatus.Added || x.Status == FileStatus.Modified))
+                    {
+                        var folderPath = @"buffer\" + Path.GetDirectoryName(fileInfo.Path);
+                        if (!Directory.Exists(folderPath))
+                            Directory.CreateDirectory(folderPath);
+                        File.Copy(config.BuildPath + fileInfo.Path, @"buffer\" + fileInfo.Path);
                     }
-                case _substituteCommandName:
-                    if (commandParams.Length < 4)
-                        return null;
 
-                    var filesInfo = FoldersSubstitute.Substitute(commandParams[2], commandParams[3]);
-                    try
-                    {
-                        using (var memoryStream = new MemoryStream())
-                        {
-                            if (Directory.Exists("buffer"))
-                                Directory.Delete("buffer", true);
-                            Directory.CreateDirectory("buffer");
+                    using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                        archive.CreateEntryFromDirectory("buffer");
+                    resources.Add("archive", memoryStream.ToArray());
 
-                            foreach (var fileInfo in filesInfo.Where(x => x.Status == FileStatus.Added || x.Status == FileStatus.Modified))
-                            {
-                                var folderPath = @"buffer\" + Path.GetDirectoryName(fileInfo.Path);
-                                if (!Directory.Exists(folderPath))
-                                    Directory.CreateDirectory(folderPath);
-                                File.Copy(commandParams[3] + fileInfo.Path, @"buffer\" + fileInfo.Path);
-                            }
+                    if (Directory.Exists("buffer"))
+                        Directory.Delete("buffer", true);
 
-                            using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
-                                archive.CreateEntryFromDirectory("buffer");
-                            resources.Add(commandParams[0], memoryStream.ToArray());
-
-                            return _generateReplaceCommand(commandParams[0], commandParams[1], filesInfo);
-                        }
-                    }catch(Exception ex)
-                    {
-                        throw ex;
-                    }
-                    finally
-                    {
-                        if (Directory.Exists("buffer"))
-                            Directory.Delete("buffer", true);
-                    }
-                default:
-                    return null;
+                    return _generateReplaceCommand(stopCode, filesInfo);
+                }
             }
         }
     }
