@@ -117,7 +117,7 @@ namespace Assembler.Compiler.WinApp
                     res = compilation.Emit(
                         peStream: fstream,
                         manifestResources: resources,
-                        win32Resources: compilation.CreateDefaultWin32Resources(true, false, null, File.OpenRead(_iconPath))
+                        win32Resources: _iconPath != null ? compilation.CreateDefaultWin32Resources(true, false, null, File.OpenRead(_iconPath)) : null
                     );
                 }
 

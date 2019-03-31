@@ -20,7 +20,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
         {
             return ObjectGenerator.Generate(
                             null,
-                            "Unpack",
+                            "Major",
                             $@"installPath",
                             $@"(byte[])_getResxByName({StringGenerator.Generate("archive")})",
                             stopCode);
@@ -35,7 +35,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
         {
             return ObjectGenerator.Generate(
                             null,
-                            "Replace",
+                            "Minor",
                             $@"installPath",
                             _generateDeletedFilesList(info),
                             $@"(byte[])_getResxByName({StringGenerator.Generate("archive")})",

@@ -1,8 +1,8 @@
 ﻿{
-  "OutputPath": "D:\\InstallTest\\5.exe",
-  "IconPath": "C:\\Users\\akurochkin\\Downloads\\Icon.ico",
+  "OutputPath": "E:\\5.exe",
+  "IconPath": null,
   "FrameworkVer": "3.5",
-  "Type": "advanced",
+  "Type": "simple",
   "AppName": "Test programm 455",
   "Description": "блаблабла\\nблаблбабла2",
   "AfterInstallMessage": "блаблабла2",
@@ -11,11 +11,11 @@
   "Version": "4",
   "ForVersion": "3",
 
-  "BuildPath": "C:\\Users\\akurochkin\\Downloads",
+  "BuildPath": "C:\\Users\\menow\\Desktop\\1",
   "VersionsFolderPath": "Versions",
 
   "StartAfterInstall": [
-    "vs.exe"
+
   ],
   "DesktopShortCuts": [
 

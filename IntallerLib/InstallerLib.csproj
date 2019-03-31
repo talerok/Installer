@@ -52,6 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Installer\Backup\FullBackup.cs" />
+    <Compile Include="Installer\Backup\PatchBackup.cs" />
     <Compile Include="Installer\Helpers\ConfigFile.cs" />
     <Compile Include="Installer\Helpers\ShortCut.cs" />
     <Compile Include="Installer\InstallCheck\AdminCheck.cs" />
@@ -69,8 +71,9 @@
     <Compile Include="Installer\InstallCommand\ShortCut\ShortCutInfo.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\ShortCutsCommand.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\StartMenu.cs" />
-    <Compile Include="Installer\InstallCommand\Unpacking\Replace.cs" />
-    <Compile Include="Installer\InstallCommand\Unpacking\Unpack.cs" />
+    <Compile Include="Installer\InstallCommand\Unpacking\Minor.cs" />
+    <Compile Include="Installer\InstallCommand\Unpacking\Major.cs" />
+    <Compile Include="Installer\InstallCommand\Unpacking\Unpacking.cs" />
     <Compile Include="Installer\InstallInfo\GetPath.cs" />
     <Compile Include="Installer\InstallInfo\GetVersion.cs" />
     <Compile Include="Installer\InstallInfo\Interfaces\IInstallInfo.cs" />
