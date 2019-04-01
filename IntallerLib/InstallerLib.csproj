@@ -52,8 +52,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Installer\Backup\FullBackup.cs" />
-    <Compile Include="Installer\Backup\PatchBackup.cs" />
+    <Compile Include="Installer\InstallBackup\FullBackup.cs" />
+    <Compile Include="Installer\InstallBackup\PatchBackup.cs" />
     <Compile Include="Installer\Helpers\ConfigFile.cs" />
     <Compile Include="Installer\Helpers\ShortCut.cs" />
     <Compile Include="Installer\InstallCheck\AdminCheck.cs" />

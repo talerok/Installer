@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using Ionic.Zip;
-using InstallerLib.Installer.Backup;
+using InstallerLib.Installer.InstallBackup;
 
 namespace InstallerLib.Installer.InstallCommand.Unpacking
 {
