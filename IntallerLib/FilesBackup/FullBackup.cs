@@ -1,11 +1,12 @@
-﻿using System;
+﻿using InstallerLib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace InstallerLib.Installer.InstallBackup
+namespace InstallerLib.FilesBackup
 {
     class FullBackup
     {
@@ -23,17 +24,6 @@ namespace InstallerLib.Installer.InstallBackup
 
             foreach (var directory in System.IO.Directory.GetDirectories(sourceDir))
                 _copyToDir(directory, Path.Combine(targetDir, Path.GetFileName(directory)));
-        }
-
-        private string _checkMD5(string filename)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    return Encoding.Default.GetString(md5.ComputeHash(stream));
-                }
-            }
         }
 
         private string _generateBackupFolderPath()
@@ -57,17 +47,36 @@ namespace InstallerLib.Installer.InstallBackup
             _hasBackup = true;
         }
 
+        private void _restoreFile(string backupFile, string originalFile)
+        {
+            var dirPath = Path.GetDirectoryName(originalFile);
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            File.Copy(backupFile, originalFile, true);
+        }
+
         private void _restoreFiles()
         {
-            foreach (var backupFile in Directory.GetFiles(_backupPath, "*", SearchOption.AllDirectories))
+            if (!_hasBackup)
+                return;
+
+            var info = FoldersSubstitute.Substitute(_backupPath, _originalPath);
+
+            foreach (var file in info)
             {
                 try // Востанавливаем все, что можем
                 {
-                    var originalFile = backupFile.Replace(_backupPath, _originalPath);
-                    if (!File.Exists(originalFile))
-                        File.Delete(originalFile);
-                    else if (_checkMD5(originalFile) != _checkMD5(backupFile))
-                        File.Copy(backupFile, originalFile, true);
+                    switch (file.Status)
+                    {
+                        case FileStatus.Added:
+                            File.Delete(_originalPath + file.Path);
+                            break;
+                        case FileStatus.Deleted:
+                        case FileStatus.Modified:
+                            _restoreFile(_backupPath + file.Path, _originalPath + file.Path);
+                            break;
+                    }
                 }
                 catch
                 {
@@ -78,12 +87,13 @@ namespace InstallerLib.Installer.InstallBackup
 
         private void _restoreFolders()
         {
-            var folders = Directory.GetDirectories(_backupPath, "*", SearchOption.AllDirectories).Select(x => x.Replace(_backupPath, _originalPath))
-                .Where(x => !Directory.Exists(x));
+            var folders = Directory.GetDirectories(_originalPath, "*", SearchOption.AllDirectories);
             foreach (var folder in folders)
                 try
                 {
-                    Directory.Delete(folder, true);
+                    var backupPath = folder.Replace(_originalPath, _backupPath);
+                    if(!Directory.Exists(backupPath))
+                        Directory.Delete(folder, true);
                 }
                 catch
                 {
@@ -102,8 +112,8 @@ namespace InstallerLib.Installer.InstallBackup
         {
             if (!_hasBackup)
                 return;
-            _restoreFolders();
             _restoreFiles();
+            _restoreFolders();
             _hasBackup = false;
 
             Finish();

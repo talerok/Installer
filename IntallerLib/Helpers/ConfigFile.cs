@@ -6,7 +6,7 @@ using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using System.IO;
 
-namespace InstallerLib.Installer.Helpers
+namespace InstallerLib.Helpers
 {
     class ConfigFile
     {
@@ -62,7 +62,7 @@ namespace InstallerLib.Installer.Helpers
             File.WriteAllText(fullPath, JsonConvert.SerializeObject(config));
             File.SetAttributes(fullPath, FileAttributes.Hidden);
         }
-
+       
         public void Delete()
         {
             var fullPath = _getFullPath();

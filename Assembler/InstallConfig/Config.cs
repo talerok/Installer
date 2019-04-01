@@ -19,6 +19,10 @@ namespace Assembler.InstallConfig
         public string Type { get; set; }
 
         public string AppName { get; set; }
+        public string CompanyName { get; set; }
+
+        public string UninstallerPath { get; set; }
+
         public string Description { get; set; }
         public string AfterInstallMessage { get; set; }
 

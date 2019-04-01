@@ -52,21 +52,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Installer\InstallBackup\FullBackup.cs" />
-    <Compile Include="Installer\InstallBackup\PatchBackup.cs" />
-    <Compile Include="Installer\Helpers\ConfigFile.cs" />
-    <Compile Include="Installer\Helpers\ShortCut.cs" />
+    <Compile Include="FilesBackup\FilesBackup.cs" />
+    <Compile Include="Helpers\FilesComparer.cs" />
+    <Compile Include="FilesBackup\FullBackup.cs" />
+    <Compile Include="FilesBackup\PatchBackup.cs" />
+    <Compile Include="Helpers\ConfigFile.cs" />
+    <Compile Include="Helpers\FoldersSubstitute.cs" />
+    <Compile Include="Helpers\RegValueInfo.cs" />
+    <Compile Include="Helpers\ShortCut.cs" />
     <Compile Include="Installer\InstallCheck\AdminCheck.cs" />
     <Compile Include="Installer\InstallCheck\Interfaces\IInstallCheck.cs" />
     <Compile Include="Installer\InstallCommand\InstallException.cs" />
     <Compile Include="Installer\InstallCommand\Intefaces\IInstallCommand.cs" />
+    <Compile Include="Installer\InstallCommand\Registry\RegisterProgram.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\AutoStart.cs" />
-    <Compile Include="Installer\Helpers\OSInfo.cs" />
-    <Compile Include="Installer\Helpers\RegistryExtensions.cs" />
-    <Compile Include="Installer\InstallCommand\Registry\RegValueKind.cs" />
+    <Compile Include="Helpers\OSInfo.cs" />
+    <Compile Include="Helpers\RegistryExtensions.cs" />
     <Compile Include="Installer\InstallCommand\Directory\SetPath.cs" />
     <Compile Include="Installer\InstallCommand\Directory\SetVersion.cs" />
-    <Compile Include="Installer\InstallCommand\Registry\SimpleRegisterCommand.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\Desktop.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\ShortCutInfo.cs" />
     <Compile Include="Installer\InstallCommand\ShortCut\ShortCutsCommand.cs" />
@@ -77,12 +80,15 @@
     <Compile Include="Installer\InstallInfo\GetPath.cs" />
     <Compile Include="Installer\InstallInfo\GetVersion.cs" />
     <Compile Include="Installer\InstallInfo\Interfaces\IInstallInfo.cs" />
+    <Compile Include="Progress\ProgressEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources1.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Uninstaller\Uninstaller.cs" />
+    <Compile Include="Uninstaller\UninstallException.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

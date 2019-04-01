@@ -1,5 +1,6 @@
-﻿using InstallerLib.Installer.Helpers;
+﻿using InstallerLib.Helpers;
 using InstallerLib.Installer.InstallCommand.Interfaces;
+using InstallerLib.Progress;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +11,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
 {
     public class SetPath : IInstallCommand
     {
-        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+        public event EventHandler<ProgressEventArgs> InstallProgressEventHandler;
 
         private string _appName;
         private string _appPath;
@@ -28,7 +29,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
         {
             try
             {
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(Properties.Resources.SetPathDescription, _appPath), 100));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(Properties.Resources.SetPathDescription, _appPath), 100));
 
                 var configManager = new ConfigFileManager(_appName);
                 _backup = configManager.Read();

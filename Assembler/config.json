@@ -1,17 +1,20 @@
 ﻿{
-  "OutputPath": "E:\\5.exe",
-  "IconPath": null,
+  "OutputPath": "D:\\InstallTest\\uninstaller.exe",
+  "IconPath": "C:\\Users\\akurochkin\\Desktop\\icon.ico",
   "FrameworkVer": "3.5",
-  "Type": "simple",
-  "AppName": "Test programm 455",
+  "Type": "uninstaller",
+  "AppName": "Test Programm",
+  "CompanyName": "Сигма",
   "Description": "блаблабла\\nблаблбабла2",
   "AfterInstallMessage": "блаблабла2",
   "UseDefaultPath": false,
   "DefaultPath": "",
-  "Version": "4",
-  "ForVersion": "3",
 
-  "BuildPath": "C:\\Users\\menow\\Desktop\\1",
+  "Version": "1.0.0",
+  "ForVersion": null,
+
+  "UninstallerPath": "uninstaller.exe",
+  "BuildPath": "C:\\Users\\akurochkin\\Desktop\\test",
   "VersionsFolderPath": "Versions",
 
   "StartAfterInstall": [

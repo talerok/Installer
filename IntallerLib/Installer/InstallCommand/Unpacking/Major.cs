@@ -7,7 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using Ionic.Zip;
-using InstallerLib.Installer.InstallBackup;
+using InstallerLib.FilesBackup;
+using InstallerLib.Progress;
 
 namespace InstallerLib.Installer.InstallCommand.Unpacking
 {
@@ -27,7 +28,7 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
             _stop = stop;
         }
 
-        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+        public event EventHandler<ProgressEventArgs> InstallProgressEventHandler;
 
 
         private string _generateBundleExtractExceptionMessage()
@@ -41,17 +42,17 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
             {
                 _backup = new FullBackup(_path);
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(InstallerLib.Properties.Resources.ZipBundleUnpackerDesription, _data.Length, _path), 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(InstallerLib.Properties.Resources.ZipBundleUnpackerDesription, _data.Length, _path), 0));
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Создание резервной копии", 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Создание резервной копии", 0));
 
                 _backup.Do();
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Резервная копия создана", 50));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Резервная копия создана", 50));
 
                 Unpacking.Unpack(_path, _data, _stop, InstallProgressEventHandler, this, 50.0, 100.0);
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Архив разархивирован", 100));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Архив разархивирован", 100));
             }
             catch (Exception ex)
             {
@@ -72,11 +73,11 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
                 if (_backup == null)
                     return;
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Востановление резервной копии", 100));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Востановление резервной копии", 100));
 
                 _backup.Restore();
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Резервная копия востановлена", 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Резервная копия востановлена", 0));
             }
             catch (Exception ex)
             {

@@ -1,8 +1,8 @@
-﻿using InstallerLib.Installer.Helpers;
+﻿using InstallerLib.Helpers;
 using InstallerLib.Installer.InstallInfo.Interfaces;
 using Microsoft.Win32;
 using System.IO;
-using static InstallerLib.Installer.Helpers.RegistryExtensions;
+using static InstallerLib.Helpers.RegistryExtensions;
 
 namespace InstallerLib.Installer.InstallInfo
 {

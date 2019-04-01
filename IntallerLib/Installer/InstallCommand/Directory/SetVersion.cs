@@ -1,4 +1,5 @@
 ﻿using InstallerLib.Installer.InstallCommand.Interfaces;
+using InstallerLib.Progress;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +10,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
 {
     public class SetVersion : IInstallCommand
     {
-        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+        public event EventHandler<ProgressEventArgs> InstallProgressEventHandler;
 
         private string _path;
         private string _version;
@@ -32,7 +33,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
         {
             try
             {
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(InstallerLib.Properties.Resources.SetVersionDescription, _version), 100));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(InstallerLib.Properties.Resources.SetVersionDescription, _version), 100));
                 var fullPath = _getFullPath();
                 if (File.Exists(fullPath))
                 {
@@ -52,7 +53,7 @@ namespace InstallerLib.Installer.InstallCommand.Directory
 
         public void Undo()
         {
-            InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(Properties.Resources.SetVersionUndo, 0));
+            InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(Properties.Resources.SetVersionUndo, 0));
 
             var fullPath = _getFullPath();
 

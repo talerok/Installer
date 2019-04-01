@@ -67,7 +67,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             tryBody.AppendLine("_checkVersion();");
             tryBody.AppendLine("InstallProcessEventHandler += _installEvent;");
 
-            tryBody.AppendLine(_generateInstallProccesTextPring(_config.Description, true));
+            tryBody.AppendLine(_generateInstallProccesTextPring(StringGenerator.Generate(_config.Description, false)));
           
             var catchBody = new StringBuilder();
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
@@ -116,7 +116,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.SuccesInstall:");
-            body.AppendLine(_generateInstallProccesTextPring(_config.AfterInstallMessage, true));
+            body.AppendLine(_generateInstallProccesTextPring(StringGenerator.Generate(_config.AfterInstallMessage, false)));
             body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate(_config.AfterInstallMessage)));
             body.AppendLine("_startProgram();");
             body.AppendLine("break;");

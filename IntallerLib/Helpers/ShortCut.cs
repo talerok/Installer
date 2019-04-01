@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 
-namespace InstallerLib.Installer.Helpers
+namespace InstallerLib.Helpers
 {
     static class ShellLink
     {

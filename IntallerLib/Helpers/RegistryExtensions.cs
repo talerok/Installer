@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace InstallerLib.Installer.Helpers
+namespace InstallerLib.Helpers
 {
     static class RegistryExtensions
     {
@@ -59,6 +59,12 @@ namespace InstallerLib.Installer.Helpers
           uint ulOptions,
           uint samDesired,
           out IntPtr hkResult);
+
+        public static void Clear(this RegistryKey key)
+        {
+            foreach (var value in key.GetValueNames())
+                key.DeleteValue(value);
+        }
 
         public static RegistryKey OpenBaseKey(RegistryHive registryHive, RegistryHiveType registryType)
         {

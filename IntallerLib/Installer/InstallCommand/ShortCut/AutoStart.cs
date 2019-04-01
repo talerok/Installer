@@ -1,10 +1,10 @@
 ﻿using InstallerLib.Installer.InstallCommand.Interfaces;
-using InstallerLib.Installer.Helpers;
+using InstallerLib.Helpers;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using static InstallerLib.Installer.Helpers.RegistryExtensions;
+using static InstallerLib.Helpers.RegistryExtensions;
 using System.IO;
 
 namespace InstallerLib.Installer.InstallCommand.ShortCut

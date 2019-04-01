@@ -1,4 +1,4 @@
-﻿using InstallerLib.Installer.Helpers;
+﻿using InstallerLib.Helpers;
 using InstallerLib.Installer.InstallInfo.Interfaces;
 using Microsoft.Win32;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using static InstallerLib.Installer.Helpers.RegistryExtensions;
+using static InstallerLib.Helpers.RegistryExtensions;
 
 namespace InstallerLib.Installer.InstallInfo
 {

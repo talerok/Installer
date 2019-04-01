@@ -1,5 +1,6 @@
-﻿using InstallerLib.Installer.Helpers;
+﻿using InstallerLib.Helpers;
 using InstallerLib.Installer.InstallCommand.Interfaces;
+using InstallerLib.Progress;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,7 +20,7 @@ namespace InstallerLib.Installer.InstallCommand.ShortCut
         private string _path;
         private string _appName;
 
-        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+        public event EventHandler<ProgressEventArgs> InstallProgressEventHandler;
 
         public ShortCutsCommand(string appName, IEnumerable<ShortCutInfo> shortCuts, string path)
         {
@@ -59,7 +60,7 @@ namespace InstallerLib.Installer.InstallCommand.ShortCut
                 try
                 {
                     progress += progressStep;
-                    InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(Properties.Resources.ShortLinkDescription, path), progress));
+                    InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(Properties.Resources.ShortLinkDescription, path), progress));
 
                     if (File.Exists(path))
                         File.Delete(path);
@@ -109,7 +110,7 @@ namespace InstallerLib.Installer.InstallCommand.ShortCut
             {
                 var path = _getShortCutPath(shortCut);
                 progress -= progressStep;
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(Properties.Resources.ShortCutUndo, path), progress));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(Properties.Resources.ShortCutUndo, path), progress));
                 try // Востанавливаем все что можем
                 {
                     File.Delete(path);

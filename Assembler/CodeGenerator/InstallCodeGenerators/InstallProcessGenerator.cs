@@ -110,8 +110,16 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
 
             tryBody.AppendLine(ObjectGenerator.Generate("pCheck", "GetPath", StringGenerator.Generate(config.AppName)));
-            tryBody.AppendLine("if(pCheck.GetInfo() == null)");
+
+            tryBody.AppendLine("if(pCheck.GetInfo() == null) {"); // первая установка
             tryBody.AppendLine($@"commands.Add({ObjectGenerator.Generate(null, "SetPath", StringGenerator.Generate(config.AppName), "installPath")});");
+            tryBody.AppendLine($@"commands.Add({ObjectGenerator.Generate(null, "RegisterProgram", 
+                StringGenerator.Generate(config.AppName), 
+                StringGenerator.Generate(config.Version),
+                StringGenerator.Generate(config.CompanyName),
+                $"installPath + {StringGenerator.Generate($@"\{config.UninstallerPath}")}"
+            )});");
+            tryBody.AppendLine("}");
 
             tryBody.AppendLine($"if({desktopShortCutsCode})");
             tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "Desktop")});");

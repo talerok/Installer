@@ -1,5 +1,6 @@
-﻿using InstallerLib.Installer.InstallBackup;
+﻿using InstallerLib.FilesBackup;
 using InstallerLib.Installer.InstallCommand.Interfaces;
+using InstallerLib.Progress;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,7 +18,7 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
 
         private PatchBackup _backup;
 
-        public event EventHandler<InstallProgressEventArgs> InstallProgressEventHandler;
+        public event EventHandler<ProgressEventArgs> InstallProgressEventHandler;
 
         public Minor(string path, IEnumerable<string> deletedFiles, byte[] archive, Func<bool> stop)
         {
@@ -41,7 +42,7 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
                 if (File.Exists(fullPath))
                 {
                     progress += progressOffset;
-                    InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(Properties.Resources.DeleteFile, file), progress));
+                    InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(Properties.Resources.DeleteFile, file), progress));
                     File.Delete(fullPath);
                 }
             }
@@ -61,19 +62,19 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
 
                 var unpackMaxProgrs = 50 + 50.0 * (archiveFiles.Count() / backupFiles.Count());
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(InstallerLib.Properties.Resources.ZipBundleUnpackerDesription, _archive.Length, _path), 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(InstallerLib.Properties.Resources.ZipBundleUnpackerDesription, _archive.Length, _path), 0));
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Создание резервной копии", 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Создание резервной копии", 0));
 
                 _backup.Do();
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Резервная копия создана", 50));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Резервная копия создана", 50));
 
                 Unpacking.Unpack(_path, _archive, _stop, InstallProgressEventHandler, this, 50, unpackMaxProgrs);
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Архив разархивирован", unpackMaxProgrs));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Архив разархивирован", unpackMaxProgrs));
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs(String.Format(Properties.Resources.ReplaceDescription, _path), unpackMaxProgrs));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs(String.Format(Properties.Resources.ReplaceDescription, _path), unpackMaxProgrs));
 
                 _deleteFiles(unpackMaxProgrs);
             }
@@ -96,11 +97,11 @@ namespace InstallerLib.Installer.InstallCommand.Unpacking
                 if (_backup == null)
                     return;
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Востановление резервной копии", 100));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Востановление резервной копии", 100));
 
                 _backup.Restore();
 
-                InstallProgressEventHandler.Invoke(this, new InstallProgressEventArgs("Резервная копия востановлена", 0));
+                InstallProgressEventHandler.Invoke(this, new ProgressEventArgs("Резервная копия востановлена", 0));
             }
             catch (Exception ex)
             {

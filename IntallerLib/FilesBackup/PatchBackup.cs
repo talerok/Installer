@@ -1,11 +1,12 @@
-﻿using System;
+﻿using InstallerLib.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace InstallerLib.Installer.InstallBackup
+namespace InstallerLib.FilesBackup
 {
     class PatchBackup
     {
@@ -14,17 +15,6 @@ namespace InstallerLib.Installer.InstallBackup
         private string _backupPath;
 
         private bool _hasBackup = false;
-
-        private string _checkMD5(string filename)
-        {
-            using (var md5 = MD5.Create())
-            {
-                using (var stream = File.OpenRead(filename))
-                {
-                    return Encoding.Default.GetString(md5.ComputeHash(stream));
-                }
-            }
-        }
 
         private string _getOriginalPath(string file)
         {
@@ -79,31 +69,48 @@ namespace InstallerLib.Installer.InstallBackup
                 Directory.Delete(_backupPath, true);
         }
 
-        public void Restore()
+        private void _restoreFile(string backupFile, string originalFile)
         {
-            if (!_hasBackup)
-                return;
+            var dirPath = Path.GetDirectoryName(originalFile);
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
 
-            foreach (var file in _files)
-            {
-                try // востанавливаем все что сможем
+            File.Copy(backupFile, originalFile, true);
+        }
+
+        private void _restoreFolders()
+        {
+            var folders = Directory.GetDirectories(_originalPath, "*", SearchOption.AllDirectories);
+            foreach (var folder in folders)
+                try
                 {
-                    var originalPath = _getOriginalPath(file);
-                    var backupPath = _getBackupPath(file);
+                    var backupPath = folder.Replace(_originalPath, _backupPath);
+                    if (!Directory.Exists(backupPath))
+                        Directory.Delete(folder, true);
+                }
+                catch
+                {
 
-                    var be = File.Exists(backupPath);
-                    var oe = File.Exists(originalPath);
+                }
+        }
 
-                    if (!be && oe)
-                        File.Delete(originalPath);
-                    else if (be && oe)
+        private void _restoreFiles()
+        {
+            var info = FoldersSubstitute.Substitute(_backupPath, _originalPath);
+
+            foreach (var file in info)
+            {
+                try // Востанавливаем все, что можем
+                {
+                    switch (file.Status)
                     {
-                        if (_checkMD5(backupPath) != _checkMD5(originalPath))
-                            File.Copy(backupPath, originalPath, true);
-                    }
-                    else if (be && !oe)
-                    {
-                        File.Copy(backupPath, originalPath, true);
+                        case FileStatus.Added:
+                            File.Delete(_originalPath + file.Path);
+                            break;
+                        case FileStatus.Deleted:
+                        case FileStatus.Modified:
+                            _restoreFile(_backupPath + file.Path, _originalPath + file.Path);
+                            break;
                     }
                 }
                 catch
@@ -111,6 +118,16 @@ namespace InstallerLib.Installer.InstallBackup
 
                 }
             }
+        }
+
+        public void Restore()
+        {
+            if (!_hasBackup)
+                return;
+
+            _restoreFiles();
+            _restoreFolders();
+
             Finish();
         }
 

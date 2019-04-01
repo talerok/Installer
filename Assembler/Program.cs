@@ -14,6 +14,7 @@ using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.WinApp;
 using Assembler.Compiler.Interfaces;
 using Assembler.CodeGenerator.AdvancedForm;
+using Assembler.CodeGenerator.Uninstaller;
 
 namespace Assembler
 {
@@ -21,6 +22,7 @@ namespace Assembler
     {
         private const string _simpleType = "simple";
         private const string _advancedType = "advanced";
+        private const string _uninstaller = "uninstaller";
 
         private static bool _checkFrameworkVersion(string ver)
         {
@@ -64,6 +66,7 @@ namespace Assembler
         static void Main(string[] args)
         { 
             var namespaces = new[] {
+                    "InstallerLib.Progress",
                     "InstallerLib.Installer.InstallCheck",
                     "InstallerLib.Installer.InstallCommand",
                     "InstallerLib.Installer.InstallCommand.Interfaces",
@@ -71,7 +74,8 @@ namespace Assembler
                     "InstallerLib.Installer.InstallCommand.Unpacking",
                     "InstallerLib.Installer.InstallInfo",
                     "InstallerLib.Installer.InstallCommand.Directory",
-                    "InstallerLib.Installer.InstallCommand.ShortCut"
+                    "InstallerLib.Installer.InstallCommand.ShortCut",
+                    "InstallerLib.Uninstaller"
                 };
 
             try
@@ -115,16 +119,20 @@ namespace Assembler
                         var advCodeInfo = new AdvancedFormInstallCodeGenerator(config).GetCode();
                         compiler = new WinAppCompiler(config.FrameworkVer, namespaces, advCodeInfo.Code, advCodeInfo.Resources, config.IconPath);
                         break;
+                    case _uninstaller:
+                        var unstallCode = new UninstallerCodeGenerator(config);
+                        compiler = new WinAppCompiler(config.FrameworkVer, namespaces, unstallCode.Generate(), new Dictionary<string, byte[]>(), config.IconPath);
+                        break;
                     default:
-                        throw new Exception("Неизвестный тип инсталятора");
+                        throw new Exception("Неизвестный тип (Type)");
                 }
 
                 foreach (var lib in Directory.GetFiles("Libs", "*.dll"))
                     compiler.AddLocalLib(lib);
 
-                Console.WriteLine($"Сборка инсталятора {config.OutputPath}");
+                Console.WriteLine($"Сборка {config.OutputPath}");
                 compiler.Compile(config.OutputPath);
-                Console.WriteLine("Инсталятор собран");
+                Console.WriteLine("Сборка прошла успешно");
             }
             catch (CompilerException ex)
             {
