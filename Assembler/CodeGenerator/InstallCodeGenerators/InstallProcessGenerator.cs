@@ -22,7 +22,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 
         private static string _generateShortCutCommand(Config config, IEnumerable<ShortCutConfig> shortCuts, string commandName)
         {
-            var listBody = shortCuts.Select(x => ObjectGenerator.Generate(null, "ShortCutInfo", StringGenerator.Generate(x.Name), StringGenerator.Generate(x.FilePath)));
+            var listBody = shortCuts.Select(x => ObjectGenerator.Generate(null, "ShortCutInfo", StringGenerator.Generate(x.Name), $@"installPath + {StringGenerator.Generate($@"\{x.FilePath}")}"));
             var list = ListCodeGenerator.Generate(null, "ShortCutInfo", listBody);
             return ObjectGenerator.Generate(null, commandName, StringGenerator.Generate(config.AppName), list);
         }
@@ -125,10 +125,10 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "Desktop")});");
 
             tryBody.AppendLine($"if({startMenuShortCutsCode})");
-            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "StartMenu")});");
+            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.StartMenuShortCuts, "StartMenu")});");
 
             tryBody.AppendLine($"if({startUpCode})");
-            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "AutoStart")});");
+            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.AutoStart, "AutoStart")});");
 
             tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
             tryBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Финализация установки", true));

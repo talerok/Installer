@@ -184,7 +184,7 @@ namespace Assembler.CodeGenerator.Uninstaller
             unstallCatchBody.AppendLine("uninstaller.Undo();");
             unstallCatchBody.AppendLine(_generateProccesTextPring($"Программа востановлена", true));
             unstallCatchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка удаления программы"),  "ex.Message"));
-            res.AppendLine(CatchGenerator.Generate("UninstallException", "ex", unstallCatchBody.ToString()));
+            res.AppendLine(CatchGenerator.Generate("Exception", "ex", unstallCatchBody.ToString()));
 
             var finalyBody = new StringBuilder();
             finalyBody.AppendLine("Environment.Exit(0);");
@@ -200,7 +200,7 @@ namespace Assembler.CodeGenerator.Uninstaller
             res.AppendLine(ObjectGenerator.Generate("uninstaller", "Uninstaller", StringGenerator.Generate(_config.AppName)));
 
             res.AppendLine("InitializeComponent();");
-
+            res.AppendLine("this.FormClosing += (o, e) => { e.Cancel = _preventClosing; };");
             res.AppendLine("_check(uninstaller);");  
             res.AppendLine($"this.Text = {StringGenerator.Generate($" Мастер удаления {_config.AppName}")};");
             res.AppendLine("this.Shown += (o, e) => { _process(uninstaller); };");
@@ -210,6 +210,7 @@ namespace Assembler.CodeGenerator.Uninstaller
         public string Generate()
         {
             var res = new StringBuilder();
+            res.AppendLine("private bool _preventClosing = true;");
             res.AppendLine(_generateInsileDeleteFolderMethod());
             res.AppendLine(_generateRestartMethod());
             res.AppendLine(_generateCheckMethod());

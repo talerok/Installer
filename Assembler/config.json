@@ -1,12 +1,12 @@
 ﻿{
-  "OutputPath": "D:\\InstallTest\\uninstaller.exe",
+  "OutputPath": "D:\\InstallTest\\installer.exe",
   "IconPath": "C:\\Users\\akurochkin\\Desktop\\icon.ico",
   "FrameworkVer": "3.5",
-  "Type": "uninstaller",
-  "AppName": "Test Programm",
+  "Type": "advanced",
+  "AppName": "Assembler",
   "CompanyName": "Сигма",
-  "Description": "блаблабла\\nблаблбабла2",
-  "AfterInstallMessage": "блаблабла2",
+  "Description": "Installer Assembler",
+  "AfterInstallMessage": "",
   "UseDefaultPath": false,
   "DefaultPath": "",
 
@@ -14,7 +14,7 @@
   "ForVersion": null,
 
   "UninstallerPath": "uninstaller.exe",
-  "BuildPath": "C:\\Users\\akurochkin\\Desktop\\test",
+  "BuildPath": "C:\\Users\\akurochkin\\Desktop\\Assembler",
   "VersionsFolderPath": "Versions",
 
   "StartAfterInstall": [
@@ -24,7 +24,14 @@
 
   ],
   "StartMenuShortCuts": [
-
+    {
+      "Name": "Assembler\\Assembler",
+      "FilePath": "Assembler.bat"
+    },
+    {
+      "Name": "Assembler\\Config",
+      "FilePath": "config.json"
+    }
   ],
   "AutoStart": [
 

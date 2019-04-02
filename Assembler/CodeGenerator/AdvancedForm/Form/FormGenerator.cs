@@ -71,6 +71,9 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("_preapareForm();");
             tryBody.AppendLine("_checkVersion();");
+
+            tryBody.AppendLine("this.FormClosing += (o, e) => { e.Cancel = true; };");
+
             var catchBody = new StringBuilder();
             catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(-1);");
