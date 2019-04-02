@@ -4,13 +4,13 @@ using System.Text;
 
 namespace Assembler.InstallConfig
 {
-    class ShortCutConfig
+    public class ShortCutConfig
     {
         public string Name { get; set; }
         public string FilePath { get; set; }
     }
 
-    class Config
+    public class Config : ICloneable
     {
         public string OutputPath { get; set; }
         public string IconPath { get; set; }
@@ -40,5 +40,10 @@ namespace Assembler.InstallConfig
         public List<ShortCutConfig> DesktopShortCuts { get; set; }
         public List<ShortCutConfig> StartMenuShortCuts { get; set; }
         public List<ShortCutConfig> AutoStart { get; set; }
+
+        public object Clone()
+        {
+            return this.MemberwiseClone();
+        }
     }
 }

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Assembler.Compiler.Interfaces
 {
-    interface ICompiler
+    public interface ICompiler
     {
         void Compile(string path);
         void AddLocalLib(string libName);

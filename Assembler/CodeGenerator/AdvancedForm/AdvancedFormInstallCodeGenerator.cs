@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Assembler.CodeGenerator.AdvancedForm
 {
-    class AdvancedFormInstallCodeGenerator
+    public class AdvancedFormInstallCodeGenerator
     {
         private Config _config;
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Assembler.InstallConfig.Interfaces
 {
-    interface IConfigReader
+    public interface IConfigReader
     {
         Config Read();
     }

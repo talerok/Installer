@@ -5,7 +5,7 @@ using System.IO;
 
 namespace Assembler.InstallConfig
 {
-    class JSONConfigReader : IConfigReader
+    public class JSONConfigReader : IConfigReader
     {
         private string _path;
 

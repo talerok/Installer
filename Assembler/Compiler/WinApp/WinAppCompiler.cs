@@ -1,6 +1,5 @@
 ﻿using Assembler.CodeGenerator;
 using Assembler.CodeGenerator.Form;
-using Assembler.CodeGenerator.SimpleForm;
 using Assembler.Compiler.Interfaces;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -15,7 +14,7 @@ using System.Text;
 
 namespace Assembler.Compiler.WinApp
 {
-    class WinAppCompiler : ICompiler
+    public class WinAppCompiler : ICompiler
     {
         private string[] _namespaces;
         private string _code;
@@ -68,8 +67,11 @@ namespace Assembler.Compiler.WinApp
 
             List<ResourceDescription> resourceDescriptions = new List<ResourceDescription>();
             string resourcePath = string.Format("{0}.g.resources", _rootNameSpace);
-            ResourceWriter rsWriter = new ResourceWriter(resourcePath);
 
+            
+
+            var rsWriter = new ResourceWriter(resourcePath);
+            
             foreach (var resource in resources)
                 rsWriter.AddResource(resource.Key, resource.Value);
 
@@ -87,7 +89,7 @@ namespace Assembler.Compiler.WinApp
 
         private static IDictionary<string, byte[]> _generateLocalLibsResources(IDictionary<string, string> libs)
         {
-            return libs.Select(x => KeyValuePair.Create(x.Key, File.ReadAllBytes(x.Value))).ToDictionary(x => x.Key, x => x.Value);
+            return libs.Select(x => new KeyValuePair<string,byte[]>(x.Key, File.ReadAllBytes(x.Value))).ToDictionary(x => x.Key, x => x.Value);
         }
 
 
@@ -122,7 +124,7 @@ namespace Assembler.Compiler.WinApp
                 }
 
                 if (!res.Success)
-                    throw new CompilerException($"\n\n{ListingGenerator.GenerateCodeLisning(code)}\n\n{string.Join('\n', res.Diagnostics.Select(x => x.ToString()))}");
+                    throw new CompilerException($"\n\n{ListingGenerator.GenerateCodeLisning(code)}\n\n{string.Join("\n", res.Diagnostics.Select(x => x.ToString()))}");
             }
             catch (CodeGeneratorException ex)
             {

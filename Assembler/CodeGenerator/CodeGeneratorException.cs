@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Assembler.CodeGenerator
 {
-    class CodeGeneratorException : Exception
+    public class CodeGeneratorException : Exception
     {
         public CodeGeneratorException(string msg) : base(msg)
         {

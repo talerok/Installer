@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Assembler.Compiler
 {
-    class CompilerException : Exception
+    public class CompilerException : Exception
     {
         public CompilerException(string msg) : base(msg) { }
     }

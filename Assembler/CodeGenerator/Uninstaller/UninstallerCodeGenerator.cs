@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Assembler.CodeGenerator.Uninstaller
 {
-    class UninstallerCodeGenerator
+    public class UninstallerCodeGenerator
     {
         private Config _config;
 
