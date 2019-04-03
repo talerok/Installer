@@ -10,7 +10,7 @@ using Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
 
 namespace Assembler
 {
@@ -104,7 +104,9 @@ namespace Assembler
 
         private string _generateFileNameByTemplate(BuildType buildType)
         {
-            var properties = _config.GetType().GetProperties();
+            var properties = _config.GetType().GetProperties().Union(
+                buildType == BuildType.Major ? _config.MajorConfig.GetType().GetProperties() 
+                : _config.MinorConfig.GetType().GetProperties());
 
             string template = buildType == BuildType.Major ? _config.MajorConfig.FileNameTemplate : _config.MinorConfig.FileNameTemplate;
 
