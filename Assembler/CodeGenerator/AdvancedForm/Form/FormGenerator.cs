@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Localization;
+using Common;
 
 namespace Assembler.CodeGenerator.AdvancedForm.Form
 {
@@ -13,7 +15,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
 
         private static string _generateLabel(Config config)
         {
-            return StringGenerator.Generate($"Мастер установки {config.AppName} {config.Version}");
+            return Resources.InstallerName.GetFormated($@"{config.AppName} {config.Version}");
         }
 
         private static string _generatePrepareFormMethod(Config config, BuildType buildType)
@@ -45,7 +47,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             if (buildType == BuildType.Minor)
             {
                 res.AppendLine(@"if (installPath == null)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
+                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(Resources.InstallCatalogNotFound)));
                 res.AppendLine("page2.Path = installPath;");
                 res.AppendLine("page2.BlockSelectPath();");
             }
@@ -75,7 +77,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             tryBody.AppendLine("this.FormClosing += (o, e) => { e.Cancel = true; };");
 
             var catchBody = new StringBuilder();
-            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
+            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.InstallerInitError), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(-1);");
 
             var res = new StringBuilder();
@@ -112,7 +114,6 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
                                 this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
                                 this.MaximizeBox = false;
                                 this.MinimizeBox = false;
-                                this.Name = ""Form1"";
                                 this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
                                 this.Text = ""Form1"";
                                 this.ResumeLayout(false);

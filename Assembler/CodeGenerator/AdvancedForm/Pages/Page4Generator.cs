@@ -1,4 +1,5 @@
 ﻿using Assembler.InstallConfig;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,32 +58,19 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
         {
             var res = new StringBuilder();
 
-            res.AppendLine(@"/// <summary> 
-                            /// Обязательная переменная конструктора.
-                            /// </summary>
-                            private System.ComponentModel.IContainer components = null;
-
-                            /// <summary> 
-                            /// Освободить все используемые ресурсы.
-                            /// </summary>
-                            /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
+            res.AppendLine($@"private System.ComponentModel.IContainer components = null;
+ 
                             protected override void Dispose(bool disposing)
-                            {
+                            {{
                                 if (disposing && (components != null))
-                                {
+                                {{
                                     components.Dispose();
-                                }
+                                }}
                                 base.Dispose(disposing);
-                            }
+                            }}
 
-                            #region Код, автоматически созданный конструктором компонентов
-
-                            /// <summary> 
-                            /// Требуемый метод для поддержки конструктора — не изменяйте 
-                            /// содержимое этого метода с помощью редактора кода.
-                            /// </summary>
                             private void InitializeComponent()
-                            {
+                            {{
                                 this.CloseButton = new System.Windows.Forms.Button();
                                 this.Introduction = new System.Windows.Forms.Label();
                                 this.StartProgramCheckBox = new System.Windows.Forms.CheckBox();
@@ -97,7 +85,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.CloseButton.Name = ""CloseButton"";
                                 this.CloseButton.Size = new System.Drawing.Size(75, 23);
                                 this.CloseButton.TabIndex = 8;
-                                this.CloseButton.Text = ""Закрыть"";
+                                this.CloseButton.Text = ""{Resources.CloseButtonText}"";
                                 this.CloseButton.UseVisualStyleBackColor = true;
                                 // 
                                 // Introduction
@@ -108,7 +96,6 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.Introduction.Name = ""Introduction"";
                                 this.Introduction.Size = new System.Drawing.Size(175, 24);
                                 this.Introduction.TabIndex = 9;
-                                this.Introduction.Text = ""Мастер установки"";
                                 // 
                                 // StartProgramCheckBox
                                 // 
@@ -117,7 +104,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.StartProgramCheckBox.Name = ""StartProgramCheckBox"";
                                 this.StartProgramCheckBox.Size = new System.Drawing.Size(274, 17);
                                 this.StartProgramCheckBox.TabIndex = 10;
-                                this.StartProgramCheckBox.Text = ""Запустить программу по завершению установки"";
+                                this.StartProgramCheckBox.Text = ""{Resources.StartProgramAfterInstallText}"";
                                 this.StartProgramCheckBox.UseVisualStyleBackColor = true;
                                 // 
                                 // groupBox1
@@ -153,9 +140,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.ResumeLayout(false);
                                 this.PerformLayout();
 
-                            }
-
-                            #endregion
+                            }}
 
                             private System.Windows.Forms.Button CloseButton;
                             private System.Windows.Forms.Label Introduction;

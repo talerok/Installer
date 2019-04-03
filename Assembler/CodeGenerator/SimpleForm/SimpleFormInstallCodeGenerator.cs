@@ -1,6 +1,8 @@
 ﻿using Assembler.CodeGenerator.Form;
 using Assembler.CodeGenerator.InstallCodeGenerators;
 using Assembler.InstallConfig;
+using Common;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +23,7 @@ namespace Assembler.CodeGenerator.SimpleForm
         private string _generatePrepareFormMethod()
         {
             var res = new StringBuilder();
-            var formName = StringGenerator.Generate($"Установщик {_config.AppName} Version {_config.Version}");
+            var formName = Resources.InstallerName.GetFormated($@"{_config.AppName} {_config.Version}");
             res.AppendLine($"this.Text = {formName};");
 
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(_config.AppName)));
@@ -35,7 +37,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             if (_buildType == BuildType.Minor)
             {
                 res.AppendLine(@"if (installPath == null)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
+                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(Resources.InstallCatalogNotFound)));
                 res.AppendLine("pathTextBox.Text = installPath;");
                 res.AppendLine("SelectPathButton.Enabled = false;");
                 res.AppendLine("InstallButton.Enabled = true;");
@@ -71,7 +73,7 @@ namespace Assembler.CodeGenerator.SimpleForm
             tryBody.AppendLine(_generateInstallProccesTextPring(StringGenerator.Generate(_config.Description, false)));
           
             var catchBody = new StringBuilder();
-            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка инициализации установщика"), "ex.Message"));
+            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.InstallerInitError), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(-1);");
 
 
@@ -118,13 +120,12 @@ namespace Assembler.CodeGenerator.SimpleForm
 
             body.AppendLine("case InstallEventType.SuccesInstall:");
             body.AppendLine(_generateInstallProccesTextPring(StringGenerator.Generate(_config.AfterInstallMessage, false)));
-            body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Установка"), StringGenerator.Generate(_config.AfterInstallMessage)));
+            body.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.InstallationMessageTittle), StringGenerator.Generate(_config.AfterInstallMessage)));
             body.AppendLine("_startProgram();");
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.FailInstall:");
-            body.AppendLine(_generateInstallProccesTextPring("Установка завершилась с ошибкой", true));
-            body.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка установки"), "(string)args.Info"));
+            body.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.InstallationErrorMessageText), "(string)args.Info"));
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.SetProgressMaxValue:");

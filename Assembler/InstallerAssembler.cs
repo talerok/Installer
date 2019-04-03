@@ -7,6 +7,7 @@ using Assembler.Compiler.Interfaces;
 using Assembler.Compiler.WinApp;
 using Assembler.InstallConfig;
 using Common;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,7 +91,7 @@ namespace Assembler
 
         private void _assembleUninstaller()
         {
-            _print("Сборка деинсталятора");
+            _print(Resources.UninstallerAssemblingMessageText);
             var unstallCode = new UninstallerCodeGenerator(_config);
             var uninstallerCompiler = new WinAppCompiler(_config.FrameworkVer, _namespaces, unstallCode.Generate(), new Dictionary<string, byte[]>(), _config.IconPath);
             var path = $@"{_config.BuildPath}\uninstaller.exe";
@@ -132,7 +133,7 @@ namespace Assembler
 
         private void _saveVersion()
         {
-            _print("Копирование файлов сборки");
+            _print(Resources.CopyBuildFilesMessageText);
 
             if (Directory.Exists(_config.BuildPath))
                 Directory.Delete(_config.BuildPath, true);
@@ -145,10 +146,10 @@ namespace Assembler
             try
             {
                 if (!Framework.Check(_config.FrameworkVer))
-                    throw new Exception("Неизвестная версия .Net Framework");
+                    throw new Exception(Resources.IncorrectFrameworkVersionMessageText);
 
                 if (!Framework.Exists(_config.FrameworkVer))
-                    throw new Exception($@"Версия .Net Framework {_config.FrameworkVer} не найдена на компьютере");
+                    throw new Exception(Resources.FrameworkNotFoundMessageText.GetFormated(_config.FrameworkVer));
 
                 var output = _generateOutputPath(buildType);
                 var dir = Path.GetDirectoryName(output);
@@ -160,23 +161,23 @@ namespace Assembler
 
                 var compiler = _getCompiler(buildType);
   
-                _print($"Сборка {output}");
+                _print(Resources.AssemblingMessageText.GetFormated(output));
                 compiler.Compile(output);
-                _print("Сборка прошла успешно");
+                _print(Resources.AssemblingFinishMessageText);
             }
             catch (CompilerException ex)
             {
-                _print("Ошибка компиляции:");
+                _print(Resources.CompilationErrorMessageText);
                 _print(ex.Message);
             }
             catch (CodeGeneratorException ex)
             {
-                _print("Ошибка генерации кода:");
+                _print(Resources.CodeGenerationErrorMessageText);
                 _print(ex.Message);
             }
             catch (Exception ex)
             {
-                _print("Ошибка упаковщика:");
+                _print(Resources.AssemblerErrorMessageText);
                 _print(ex.Message);
             }
         }

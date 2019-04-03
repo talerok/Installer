@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AutoStartShortCutTextBoxText" xml:space="preserve">
+    <value>Добавить программу в автозапуск</value>
+  </data>
+  <data name="BackButtonText" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="CancelInstallButtonText" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="CancelInstallMessageText" xml:space="preserve">
+    <value>Отмена установки</value>
+  </data>
+  <data name="CancelInstallQuestion" xml:space="preserve">
+    <value>Отменить установку?</value>
+  </data>
+  <data name="CloseButtonText" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="DesktopShortCutTextBoxText" xml:space="preserve">
+    <value>Создать ярлык на рабочем столе</value>
+  </data>
+  <data name="InstallationCanceled" xml:space="preserve">
+    <value>Установка была отменена</value>
+  </data>
+  <data name="InstallationError" xml:space="preserve">
+    <value>Установка завершилась с ошибкой</value>
+  </data>
+  <data name="InstallationErrorMessageText" xml:space="preserve">
+    <value>Ошибка установки</value>
+  </data>
+  <data name="InstallationMessageTittle" xml:space="preserve">
+    <value>Установка</value>
+  </data>
+  <data name="InstallationStartMessageText" xml:space="preserve">
+    <value>Запуск установки</value>
+  </data>
+  <data name="InstallButtonText" xml:space="preserve">
+    <value>Установить</value>
+  </data>
+  <data name="InstallCatalogNotFound" xml:space="preserve">
+    <value>Не найден каталог установки</value>
+  </data>
+  <data name="InstallerInitError" xml:space="preserve">
+    <value>Ошибка инициализации установщика</value>
+  </data>
+  <data name="InstallerName" xml:space="preserve">
+    <value>Мастер установки {0}</value>
+  </data>
+  <data name="InstallFinalizationMessageText" xml:space="preserve">
+    <value>Финализация установки</value>
+  </data>
+  <data name="InstallFolderText" xml:space="preserve">
+    <value>Папка установки</value>
+  </data>
+  <data name="NeedAdminMessageText" xml:space="preserve">
+    <value>Для запуска нужны права администратора</value>
+  </data>
+  <data name="NextButtonText" xml:space="preserve">
+    <value>Далее</value>
+  </data>
+  <data name="ProgrammNotFound" xml:space="preserve">
+    <value>Программа не найдена</value>
+  </data>
+  <data name="RecoveryProgramFinishMessageText" xml:space="preserve">
+    <value>Программа востановлена</value>
+  </data>
+  <data name="RecoveryProgramMessageText" xml:space="preserve">
+    <value>Востановление программы</value>
+  </data>
+  <data name="RevertInstallMessageText" xml:space="preserve">
+    <value>Откат изменений</value>
+  </data>
+  <data name="SelectFolderButtonText" xml:space="preserve">
+    <value>Обзор...</value>
+  </data>
+  <data name="StartMenuShortCutTextBoxText" xml:space="preserve">
+    <value>Создать ярлык в меню пуск</value>
+  </data>
+  <data name="StartProgramAfterInstallText" xml:space="preserve">
+    <value>Запустить программу по завершению установки</value>
+  </data>
+  <data name="UninstallerName" xml:space="preserve">
+    <value>Мастер удаления {0}</value>
+  </data>
+  <data name="UninstallerQuestionMessageText" xml:space="preserve">
+    <value>Вы действительно хотите удалить {0}</value>
+  </data>
+  <data name="UninstallErrorMessageText" xml:space="preserve">
+    <value>Ошибка удаления программы</value>
+  </data>
+  <data name="UninstallFinalization" xml:space="preserve">
+    <value>Финализация удаление программы</value>
+  </data>
+  <data name="UninstallFinishMessageText" xml:space="preserve">
+    <value>Программа была успешно удалена</value>
+  </data>
+  <data name="UninstallProgramMessageText" xml:space="preserve">
+    <value>Удаление программы {0}</value>
+  </data>
+  <data name="VersionErrorMessageText1" xml:space="preserve">
+    <value>Установлена более поздняя версия программы (текущая версия: {0}, версия установщика: {1})</value>
+  </data>
+  <data name="VersionErrorMessageText2" xml:space="preserve">
+    <value>Установлена неподходящая версия программы (текущая версия: {0}, версия установщика: {1})</value>
+  </data>
+  <data name="VersionFolderNotFound" xml:space="preserve">
+    <value>Не найдена папка версии {0} ({1})</value>
+  </data>
+  <data name="AssemblerErrorMessageText" xml:space="preserve">
+    <value>Ошибка сборщика</value>
+  </data>
+  <data name="AssemblingFinishMessageText" xml:space="preserve">
+    <value>Сборка прошла успешно</value>
+  </data>
+  <data name="AssemblingMessageText" xml:space="preserve">
+    <value>Сборка {0}</value>
+  </data>
+  <data name="CodeGenerationErrorMessageText" xml:space="preserve">
+    <value>Ошибка генерации кода</value>
+  </data>
+  <data name="CompilationErrorMessageText" xml:space="preserve">
+    <value>Ошибка компиляции</value>
+  </data>
+  <data name="CopyBuildFilesMessageText" xml:space="preserve">
+    <value>Копирование файлов сборки</value>
+  </data>
+  <data name="FrameworkNotFoundMessageText" xml:space="preserve">
+    <value>Версия .Net Framework {0} не найдена на компьютере</value>
+  </data>
+  <data name="IncorrectFrameworkVersionMessageText" xml:space="preserve">
+    <value>Неизвестная версия .Net Framework</value>
+  </data>
+  <data name="UninstallerAssemblingMessageText" xml:space="preserve">
+    <value>Сборка деинсталятора</value>
+  </data>
+</root>

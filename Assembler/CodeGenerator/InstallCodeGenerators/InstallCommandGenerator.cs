@@ -1,5 +1,6 @@
 ﻿using Assembler.InstallConfig;
 using Common;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -66,7 +67,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 
                     var prevVersionFolder = VersionPath.Generate(config.AppName, config.MinorConfig.ForVersion);
                     if (!Directory.Exists(prevVersionFolder))
-                        throw new CodeGeneratorException($"Не найдена папка версии {config.MinorConfig.ForVersion} ({prevVersionFolder})");
+                        throw new CodeGeneratorException(Resources.VersionFolderNotFound.GetFormated(config.MinorConfig.ForVersion, prevVersionFolder));
 
                     var filesInfo = FoldersSubstitute.Substitute(prevVersionFolder, config.BuildPath);
 

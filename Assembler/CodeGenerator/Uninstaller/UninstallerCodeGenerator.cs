@@ -1,5 +1,7 @@
 ﻿using Assembler.CodeGenerator.Form;
 using Assembler.InstallConfig;
+using Common;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,15 +19,8 @@ namespace Assembler.CodeGenerator.Uninstaller
             _config = config;
         }
 
-        private const string _designer = @"/// <summary>
-                                            /// Обязательная переменная конструктора.
-                                            /// </summary>
-                                            private System.ComponentModel.IContainer components = null;
+        private const string _designer = @" private System.ComponentModel.IContainer components = null;
 
-                                            /// <summary>
-                                            /// Освободить все используемые ресурсы.
-                                            /// </summary>
-                                            /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
                                             protected override void Dispose(bool disposing)
                                             {
                                                 if (disposing && (components != null))
@@ -35,12 +30,6 @@ namespace Assembler.CodeGenerator.Uninstaller
                                                 base.Dispose(disposing);
                                             }
 
-                                            #region Код, автоматически созданный конструктором форм Windows
-
-                                            /// <summary>
-                                            /// Требуемый метод для поддержки конструктора — не изменяйте 
-                                            /// содержимое этого метода с помощью редактора кода.
-                                            /// </summary>
                                             private void InitializeComponent()
                                             {
                                                 this.UninstallRichTextBox = new System.Windows.Forms.RichTextBox();
@@ -81,8 +70,6 @@ namespace Assembler.CodeGenerator.Uninstaller
                                                 this.Visible = false;
 
                                             }
-
-                                            #endregion
 
                                             private const int WS_SYSMENU = 0x80000;
                                             private RichTextBox UninstallRichTextBox;
@@ -138,22 +125,22 @@ namespace Assembler.CodeGenerator.Uninstaller
             var tryBody = new StringBuilder();
 
             tryBody.AppendLine($@"if(!adminCheck.Check())");
-            tryBody.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("Деинсталлятор должен быть запущен от имени администратора")));
+            tryBody.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(Resources.NeedAdminMessageText)));
 
             tryBody.AppendLine("if(!uninstaller.Check())");
-            tryBody.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("Программа не найдена")));
+            tryBody.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(Resources.ProgrammNotFound)));
 
             tryBody.AppendLine("if(_insideDeleteFolder(uninstaller))");
             tryBody.AppendLine("_restart();");
 
-            tryBody.AppendLine($@"if (MessageBox.Show({StringGenerator.Generate($"Вы действительно хотите удалить {_config.AppName}?")},
+            tryBody.AppendLine($@"if (MessageBox.Show({StringGenerator.Generate(Resources.UninstallerQuestionMessageText.GetFormated(_config.AppName))},
                 {StringGenerator.Generate("Удаление программы")}, MessageBoxButtons.YesNo) == DialogResult.No)");
             tryBody.AppendLine("Environment.Exit(0);");
 
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
 
             var catchBody = new StringBuilder();
-            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка удаления программы"), "ex.Message"));
+            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.UninstallErrorMessageText), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(0);");
             res.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
 
@@ -171,20 +158,20 @@ namespace Assembler.CodeGenerator.Uninstaller
 
             tryBody.AppendLine($@"uninstaller.UninstallEventHandler += (o, e) => {{ {eventHandlerBody.ToString()} }};");
 
-            tryBody.AppendLine(_generateProccesTextPring($"Удаление программы {_config.AppName}", true));
+            tryBody.AppendLine(_generateProccesTextPring(Resources.UninstallProgramMessageText.GetFormated(_config.AppName), true));
             tryBody.AppendLine("uninstaller.Do();");
-            tryBody.AppendLine(_generateProccesTextPring($"Финализация удаление программы", true));
+            tryBody.AppendLine(_generateProccesTextPring(Resources.UninstallFinalization, true));
             tryBody.AppendLine("uninstaller.Finish();");
-            tryBody.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate("Удаление программы"), StringGenerator.Generate("Программа была успешно удалена")));
+            tryBody.AppendLine(InfoMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.UninstallProgramMessageText.GetFormated(_config.AppName)), StringGenerator.Generate(Resources.UninstallFinishMessageText)));
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
 
             var unstallCatchBody = new StringBuilder();
 
             unstallCatchBody.AppendLine(_generateProccesTextPring("ex.Message"));
-            unstallCatchBody.AppendLine(_generateProccesTextPring($"Востановление программы", true));
+            unstallCatchBody.AppendLine(_generateProccesTextPring(Resources.RecoveryProgramMessageText, true));
             unstallCatchBody.AppendLine("uninstaller.Undo();");
-            unstallCatchBody.AppendLine(_generateProccesTextPring($"Программа востановлена", true));
-            unstallCatchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка удаления программы"),  "ex.Message"));
+            unstallCatchBody.AppendLine(_generateProccesTextPring(Resources.RecoveryProgramFinishMessageText, true));
+            unstallCatchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.UninstallErrorMessageText),  "ex.Message"));
             res.AppendLine(CatchGenerator.Generate("Exception", "ex", unstallCatchBody.ToString()));
 
             var finalyBody = new StringBuilder();
@@ -206,14 +193,14 @@ namespace Assembler.CodeGenerator.Uninstaller
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("this.FormClosing += (o, e) => { e.Cancel = _preventClosing; };");
             tryBody.AppendLine("_check(uninstaller);");
-            tryBody.AppendLine($"this.Text = {StringGenerator.Generate($" Мастер удаления {_config.AppName}")};");
+            tryBody.AppendLine($"this.Text = {StringGenerator.Generate(Resources.UninstallerName.GetFormated(_config.AppName))});");
             tryBody.AppendLine("this.Shown += (o, e) => { _process(uninstaller); };");
             tryBody.AppendLine("this.Visible = true;");
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
 
             var catchBody = new StringBuilder();
 
-            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка удаления программы"), "ex.Message"));
+            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate(Resources.UninstallErrorMessageText), "ex.Message"));
             catchBody.AppendLine("Environment.Exit(0);");
 
             res.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));

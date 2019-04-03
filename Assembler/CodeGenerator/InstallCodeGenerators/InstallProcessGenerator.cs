@@ -1,4 +1,6 @@
 ﻿using Assembler.InstallConfig;
+using Common;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -93,8 +95,8 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             if (!string.IsNullOrEmpty(stopInstallCode)) // Отмена установки
             {
                 forBody.AppendLine($"if({stopInstallCode}) {{");
-                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Отмена установки", true));
-                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Откат изменений", true));
+                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", Resources.CancelInstallMessageText, true));
+                forBody.AppendLine(_generateEventInvoke(eventHandler, "Message", Resources.RevertInstallMessageText, true));
                 forBody.AppendLine(undoBody);
                 forBody.AppendLine(_generateEventInvoke(eventHandler, "CanceledInstall"));
                 forBody.AppendLine("return;");
@@ -104,7 +106,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 
             code.AppendLine("List<IInstallCommand> commands = null;");
             code.AppendLine("int step = 0;");
-            code.AppendLine(_generateEventInvoke(eventHandler, "Message", "Запуск установки", true));
+            code.AppendLine(_generateEventInvoke(eventHandler, "Message", Resources.InstallationStartMessageText, true));
 
             var tryBody = new StringBuilder();
 
@@ -137,7 +139,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             }
 
             tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
-            tryBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Финализация установки", true));
+            tryBody.AppendLine(_generateEventInvoke(eventHandler, "Message", Resources.InstallFinalizationMessageText, true));
             tryBody.AppendLine(ForeachGenerator.Generate("command", "commands", foreachBody));
             tryBody.AppendLine(_generateEventInvoke(eventHandler, "SuccesInstall"));
 
@@ -146,16 +148,15 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             var InstallCatchBody = new StringBuilder();
 
 
-            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
-            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", "Выполняю откат установки", true));
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate($"{Resources.InstallationErrorMessageText}: ")} + ex.Message"));
+            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", Resources.RevertInstallMessageText, true));
             InstallCatchBody.AppendLine(undoBody);
-            InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", "Откат выполнен", true));
             InstallCatchBody.AppendLine(_generateEventInvoke(eventHandler, "FailInstall", "ex.Message"));
 
             code.AppendLine(CatchGenerator.Generate("InstallException", "ex", InstallCatchBody.ToString()));
 
             var catchBody = new StringBuilder();
-            catchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate("Ошибка установки: ")} + ex.Message"));
+            catchBody.AppendLine(_generateEventInvoke(eventHandler, "Error", $"{StringGenerator.Generate($"{Resources.InstallationErrorMessageText}: ")} + ex.Message"));
             catchBody.AppendLine(_generateEventInvoke(eventHandler, "FailInstall", "ex.Message"));
             code.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
 
@@ -171,7 +172,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 
             body.AppendLine(ObjectGenerator.Generate("adminCheck", "AdminCheck"));
             body.AppendLine($@"if(!adminCheck.Check())");
-            body.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("Инсталятор должен быть запущен от имени администратора")));
+            body.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(Resources.NeedAdminMessageText)));
 
             var res = new StringBuilder();
 
@@ -200,12 +201,18 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             if (buildType == BuildType.Major)
             {
                 res.AppendLine($@"if(currentVersion != null && currentVersion.CompareTo(""{config.Version}"") != -1)");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {config.Version})"""));
+                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(
+                    Resources.VersionErrorMessageText1.GetFormated(
+                        StringGenerator.Generate(" + currentVersion + ", false), 
+                        config.Version), false)));
             }
             else
             {
                 res.AppendLine($@"if(currentVersion == null || currentVersion != {StringGenerator.Generate(config.MinorConfig.ForVersion)})");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена неподходящая версия программы (текущая версия: "" + (currentVersion != null ? currentVersion : ""отсутствует"") + "", версия установщика: {config.MinorConfig.ForVersion})"""));
+                res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate(
+                    Resources.VersionErrorMessageText2.GetFormated(
+                        StringGenerator.Generate(@" + (currentVersion != null ? currentVersion : ""отсутствует"") + ", false),
+                        config.Version), false)));
             }
            
             return MethodGenerator.Generate(new string[] { "private" }, "void", "_checkVersion", new string[] { }, res.ToString());

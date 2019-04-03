@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Localization;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -10,32 +11,19 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
         {
             var res = new StringBuilder();
 
-            res.AppendLine(@"/// <summary> 
-                            /// Обязательная переменная конструктора.
-                            /// </summary>
-                            private System.ComponentModel.IContainer components = null;
-
-                            /// <summary> 
-                            /// Освободить все используемые ресурсы.
-                            /// </summary>
-                            /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
+            res.AppendLine($@"private System.ComponentModel.IContainer components = null;
+ 
                             protected override void Dispose(bool disposing)
-                            {
+                            {{
                                 if (disposing && (components != null))
-                                {
+                                {{
                                     components.Dispose();
-                                }
+                                }}
                                 base.Dispose(disposing);
-                            }
+                            }}
 
-                            #region Код, автоматически созданный конструктором компонентов
-
-                            /// <summary> 
-                            /// Требуемый метод для поддержки конструктора — не изменяйте 
-                            /// содержимое этого метода с помощью редактора кода.
-                            /// </summary>
                             private void InitializeComponent()
-                            {
+                            {{
                                 this.NextButton = new System.Windows.Forms.Button();
                                 this.CloseButton = new System.Windows.Forms.Button();
                                 this.Introduction = new System.Windows.Forms.Label();
@@ -50,7 +38,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.NextButton.Name = ""NextButton"";
                                 this.NextButton.Size = new System.Drawing.Size(75, 23);
                                 this.NextButton.TabIndex = 0;
-                                this.NextButton.Text = ""Далее"";
+                                this.NextButton.Text = ""{Resources.NextButtonText}"";
                                 this.NextButton.UseVisualStyleBackColor = true;
                                 // 
                                 // CloseButton
@@ -59,7 +47,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.CloseButton.Name = ""CloseButton"";
                                 this.CloseButton.Size = new System.Drawing.Size(75, 23);
                                 this.CloseButton.TabIndex = 1;
-                                this.CloseButton.Text = ""Закрыть"";
+                                this.CloseButton.Text = ""{Resources.CloseButtonText}"";
                                 this.CloseButton.UseVisualStyleBackColor = true;
                                 // 
                                 // Introduction
@@ -70,7 +58,6 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.Introduction.Name = ""Introduction"";
                                 this.Introduction.Size = new System.Drawing.Size(175, 24);
                                 this.Introduction.TabIndex = 2;
-                                this.Introduction.Text = ""Мастер установки"";
                                 // 
                                 // groupBox1
                                 // 
@@ -104,9 +91,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.ResumeLayout(false);
                                 this.PerformLayout();
 
-                            }
-
-                            #endregion
+                            }}
 
                             private System.Windows.Forms.Button NextButton;
                             private System.Windows.Forms.Button CloseButton;

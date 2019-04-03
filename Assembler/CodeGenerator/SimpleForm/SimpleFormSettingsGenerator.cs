@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Localization;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -8,32 +9,19 @@ namespace Assembler.CodeGenerator.SimpleForm
     {
         public static string Generate()
         {
-            return @"/// <summary>
-                    /// Обязательная переменная конструктора.
-                    /// </summary>
-                    private System.ComponentModel.IContainer components = null;
+            return $@"private System.ComponentModel.IContainer components = null;
 
-                    /// <summary>
-                    /// Освободить все используемые ресурсы.
-                    /// </summary>
-                    /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
                     protected override void Dispose(bool disposing)
-                    {
+                    {{
                         if (disposing && (components != null))
-                        {
+                        {{
                             components.Dispose();
-                        }
+                        }}
                         base.Dispose(disposing);
-                    }
+                    }}
 
-                    #region Код, автоматически созданный конструктором форм Windows
-
-                    /// <summary>
-                    /// Требуемый метод для поддержки конструктора — не изменяйте 
-                    /// содержимое этого метода с помощью редактора кода.
-                    /// </summary>
                     private void InitializeComponent()
-                    {
+                    {{
                         this.InstallProgressBar = new System.Windows.Forms.ProgressBar();
                         this.pathTextBox = new System.Windows.Forms.TextBox();
                         this.SelectPathButton = new System.Windows.Forms.Button();
@@ -64,7 +52,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.SelectPathButton.Name = ""SelectPathButton"";
                         this.SelectPathButton.Size = new System.Drawing.Size(98, 23);
                         this.SelectPathButton.TabIndex = 2;
-                        this.SelectPathButton.Text = ""Выбор папки"";
+                        this.SelectPathButton.Text = ""{Resources.SelectFolderButtonText}"";
                         this.SelectPathButton.UseVisualStyleBackColor = true;
                         this.SelectPathButton.Click += new System.EventHandler(this.SelectPathButton_Click);
                         // 
@@ -84,7 +72,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.InstallButton.Name = ""InstallButton"";
                         this.InstallButton.Size = new System.Drawing.Size(98, 23);
                         this.InstallButton.TabIndex = 4;
-                        this.InstallButton.Text = ""Установить"";
+                        this.InstallButton.Text = ""{Resources.InstallButtonText}"";
                         this.InstallButton.UseVisualStyleBackColor = true;
                         this.InstallButton.Click += new System.EventHandler(this.InstallButton_Click);
                         // 
@@ -95,7 +83,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.StartProgramCheckBox.Name = ""StartProgramCheckBox"";
                         this.StartProgramCheckBox.Size = new System.Drawing.Size(274, 17);
                         this.StartProgramCheckBox.TabIndex = 5;
-                        this.StartProgramCheckBox.Text = ""Запустить программу по завершению установки"";
+                        this.StartProgramCheckBox.Text = ""{Resources.StartProgramAfterInstallText}"";
                         this.StartProgramCheckBox.UseVisualStyleBackColor = true;
                         // 
                         // CloseButton
@@ -104,7 +92,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.CloseButton.Name = ""CloseButton"";
                         this.CloseButton.Size = new System.Drawing.Size(75, 23);
                         this.CloseButton.TabIndex = 6;
-                        this.CloseButton.Text = ""Закрыть"";
+                        this.CloseButton.Text = ""{Resources.CloseButtonText}"";
                         this.CloseButton.UseVisualStyleBackColor = true;
                         this.CloseButton.Click += new System.EventHandler(this.CloseButton_Click);
                         // 
@@ -128,9 +116,7 @@ namespace Assembler.CodeGenerator.SimpleForm
                         this.ResumeLayout(false);
                         this.PerformLayout();
 
-                    }
-
-                    #endregion
+                    }}
 
                     private System.Windows.Forms.ProgressBar InstallProgressBar;
                     private System.Windows.Forms.TextBox pathTextBox;
@@ -142,14 +128,14 @@ namespace Assembler.CodeGenerator.SimpleForm
 
                     private const int WS_SYSMENU = 0x80000;
                     protected override CreateParams CreateParams
-                    {
+                    {{
                         get
-                        {
+                        {{
                             CreateParams cp = base.CreateParams;
                             cp.Style &= ~WS_SYSMENU;
                             return cp;
-                        }
-                    }";
+                        }}
+                    }}";
         }
     }
 }

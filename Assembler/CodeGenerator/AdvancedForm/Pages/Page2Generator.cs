@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Localization;
 
 namespace Assembler.CodeGenerator.AdvancedForm.Pages
 {
@@ -12,32 +13,17 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
         {
             var res = new StringBuilder();
 
-            res.AppendLine(@"/// <summary> 
-                            /// Обязательная переменная конструктора.
-                            /// </summary>
-                            private System.ComponentModel.IContainer components = null;
-
-                            /// <summary> 
-                            /// Освободить все используемые ресурсы.
-                            /// </summary>
-                            /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
-                            protected override void Dispose(bool disposing)
-                            {
+            res.AppendLine($@"protected override void Dispose(bool disposing)
+                            {{
                                 if (disposing && (components != null))
-                                {
+                                {{
                                     components.Dispose();
-                                }
+                                }}
                                 base.Dispose(disposing);
-                            }
+                            }}
 
-                            #region Код, автоматически созданный конструктором компонентов
-
-                            /// <summary> 
-                            /// Требуемый метод для поддержки конструктора — не изменяйте 
-                            /// содержимое этого метода с помощью редактора кода.
-                            /// </summary>
                             private void InitializeComponent()
-                            {
+                            {{
                                 this.CloseButton = new System.Windows.Forms.Button();
                                 this.NextButton = new System.Windows.Forms.Button();
                                 this.BackButton = new System.Windows.Forms.Button();
@@ -59,7 +45,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.CloseButton.Name = ""CloseButton"";
                                 this.CloseButton.Size = new System.Drawing.Size(75, 23);
                                 this.CloseButton.TabIndex = 3;
-                                this.CloseButton.Text = ""Закрыть"";
+                                this.CloseButton.Text = ""{Resources.CloseButtonText}"";
                                 this.CloseButton.UseVisualStyleBackColor = true;
                                 // 
                                 // NextButton
@@ -69,7 +55,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.NextButton.Name = ""NextButton"";
                                 this.NextButton.Size = new System.Drawing.Size(75, 23);
                                 this.NextButton.TabIndex = 2;
-                                this.NextButton.Text = ""Установить"";
+                                this.NextButton.Text = ""{Resources.InstallButtonText}"";
                                 this.NextButton.UseVisualStyleBackColor = true;
                                 // 
                                 // BackButton
@@ -78,7 +64,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.BackButton.Name = ""BackButton"";
                                 this.BackButton.Size = new System.Drawing.Size(75, 23);
                                 this.BackButton.TabIndex = 4;
-                                this.BackButton.Text = ""Назад"";
+                                this.BackButton.Text = ""{Resources.BackButtonText}"";
                                 this.BackButton.UseVisualStyleBackColor = true;
                                 // 
                                 // SelectPathButton
@@ -87,7 +73,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.SelectPathButton.Name = ""SelectPathButton"";
                                 this.SelectPathButton.Size = new System.Drawing.Size(73, 23);
                                 this.SelectPathButton.TabIndex = 6;
-                                this.SelectPathButton.Text = ""Обзор..."";
+                                this.SelectPathButton.Text = ""{Resources.SelectFolderButtonText}"";
                                 this.SelectPathButton.UseVisualStyleBackColor = true;
                                 // 
                                 // pathTextBox
@@ -105,7 +91,6 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.Introduction.Name = ""Introduction"";
                                 this.Introduction.Size = new System.Drawing.Size(175, 24);
                                 this.Introduction.TabIndex = 9;
-                                this.Introduction.Text = ""Мастер установки"";
                                 // 
                                 // groupBox1
                                 // 
@@ -127,7 +112,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.groupBox2.Size = new System.Drawing.Size(461, 45);
                                 this.groupBox2.TabIndex = 11;
                                 this.groupBox2.TabStop = false;
-                                this.groupBox2.Text = ""Папка установки"";
+                                this.groupBox2.Text = ""{Resources.InstallFolderText}"";
                                 // 
                                 // DesktopShortCutCheckBox
                                 // 
@@ -136,7 +121,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.DesktopShortCutCheckBox.Name = ""DesktopShortCutCheckBox"";
                                 this.DesktopShortCutCheckBox.Size = new System.Drawing.Size(196, 17);
                                 this.DesktopShortCutCheckBox.TabIndex = 12;
-                                this.DesktopShortCutCheckBox.Text = ""Создать ярлык на рабочем столе"";
+                                this.DesktopShortCutCheckBox.Text = ""{Resources.DesktopShortCutTextBoxText}"";
                                 this.DesktopShortCutCheckBox.UseVisualStyleBackColor = true;
                                 // 
                                 // StartMenuShortCutCheckBox
@@ -146,7 +131,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.StartMenuShortCutCheckBox.Name = ""StartMenuShortCutCheckBox"";
                                 this.StartMenuShortCutCheckBox.Size = new System.Drawing.Size(169, 17);
                                 this.StartMenuShortCutCheckBox.TabIndex = 13;
-                                this.StartMenuShortCutCheckBox.Text = ""Создать ярлык в меню пуск"";
+                                this.StartMenuShortCutCheckBox.Text = ""{Resources.StartMenuShortCutTextBoxText}"";
                                 this.StartMenuShortCutCheckBox.UseVisualStyleBackColor = true;
                                 // 
                                 // StartUpCheckBox
@@ -156,7 +141,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.StartUpCheckBox.Name = ""StartUpCheckBox"";
                                 this.StartUpCheckBox.Size = new System.Drawing.Size(205, 17);
                                 this.StartUpCheckBox.TabIndex = 14;
-                                this.StartUpCheckBox.Text = ""Добавить программу в автозапуск"";
+                                this.StartUpCheckBox.Text = ""{Resources.AutoStartShortCutTextBoxText}"";
                                 this.StartUpCheckBox.UseVisualStyleBackColor = true;
                                 // 
                                 // Page2
@@ -178,9 +163,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.ResumeLayout(false);
                                 this.PerformLayout();
 
-                            }
-
-                            #endregion
+                            }}
 
                             private System.Windows.Forms.Button CloseButton;
                             private System.Windows.Forms.Button NextButton;

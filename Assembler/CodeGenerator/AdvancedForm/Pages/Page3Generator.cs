@@ -3,6 +3,7 @@ using Assembler.InstallConfig;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Localization;
 
 namespace Assembler.CodeGenerator.AdvancedForm.Pages
 {
@@ -54,11 +55,11 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.FailInstall:");
-            body.AppendLine($@"_showNextPage(""Установка завершилась с ошибкой: "" + (string)args.Info, true);");
+            body.AppendLine($@"_showNextPage(""{Resources.InstallationError}: "" + (string)args.Info, true);");
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.CanceledInstall:");
-            body.AppendLine($@"_showNextPage(""Установка была отменена"", true);");
+            body.AppendLine($@"_showNextPage(""{Resources.InstallationCanceled}"", true);");
             body.AppendLine("break;");
 
             body.AppendLine("case InstallEventType.SetProgressMaxValue:");
@@ -87,7 +88,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
             res.AppendLine("this.Visible = false;");
             res.AppendLine("InstallProcessEventHandler += _installEvent;");
             res.AppendLine("PreventButton.Click += (o, e) => {");
-            res.AppendLine(@"if (MessageBox.Show(""Отменить установку"", ""Установка"", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)");
+            res.AppendLine($@"if (MessageBox.Show(""{Resources.CancelInstallQuestion}"", ""{Resources.InstallationMessageTittle}"", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)");
             res.AppendLine("_prevent = true;");
             res.AppendLine("};");
             return MethodGenerator.Generate(new string[] { "public" }, "", "Page3", new string[] { }, res.ToString());
@@ -97,32 +98,19 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
         {
             var res = new StringBuilder();
 
-            res.AppendLine(@"/// <summary> 
-                            /// Обязательная переменная конструктора.
-                            /// </summary>
-                            private System.ComponentModel.IContainer components = null;
+            res.AppendLine($@"private System.ComponentModel.IContainer components = null;
 
-                            /// <summary> 
-                            /// Освободить все используемые ресурсы.
-                            /// </summary>
-                            /// <param name=""disposing"">истинно, если управляемый ресурс должен быть удален; иначе ложно.</param>
                             protected override void Dispose(bool disposing)
-                            {
+                            {{
                                 if (disposing && (components != null))
-                                {
+                                {{
                                     components.Dispose();
-                                }
+                                }}
                                 base.Dispose(disposing);
-                            }
+                            }}
 
-                            #region Код, автоматически созданный конструктором компонентов
-
-                            /// <summary> 
-                            /// Требуемый метод для поддержки конструктора — не изменяйте 
-                            /// содержимое этого метода с помощью редактора кода.
-                            /// </summary>
                             private void InitializeComponent()
-                            {
+                            {{
                                 this.InstallProccessTextBox = new System.Windows.Forms.RichTextBox();
                                 this.InstallProgressBar = new System.Windows.Forms.ProgressBar();
                                 this.PreventButton = new System.Windows.Forms.Button();
@@ -152,7 +140,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.PreventButton.Name = ""PreventButton"";
                                 this.PreventButton.Size = new System.Drawing.Size(75, 23);
                                 this.PreventButton.TabIndex = 7;
-                                this.PreventButton.Text = ""Отменить"";
+                                this.PreventButton.Text = ""{Resources.CancelInstallButtonText}"";
                                 this.PreventButton.UseVisualStyleBackColor = true;
                                 // 
                                 // groupBox1
@@ -177,9 +165,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 this.groupBox1.ResumeLayout(false);
                                 this.ResumeLayout(false);
 
-                            }
-
-                            #endregion
+                            }}
 
                             private System.Windows.Forms.RichTextBox InstallProccessTextBox;
                             private System.Windows.Forms.ProgressBar InstallProgressBar;
