@@ -52,11 +52,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FilesBackup\FilesBackup.cs" />
-    <Compile Include="Helpers\FilesComparer.cs" />
     <Compile Include="FilesBackup\FullBackup.cs" />
     <Compile Include="FilesBackup\PatchBackup.cs" />
     <Compile Include="Helpers\ConfigFile.cs" />
-    <Compile Include="Helpers\FoldersSubstitute.cs" />
     <Compile Include="Helpers\RegValueInfo.cs" />
     <Compile Include="Helpers\ShortCut.cs" />
     <Compile Include="Installer\InstallCheck\AdminCheck.cs" />
@@ -100,6 +98,11 @@
     <None Include="key.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{02a2bea2-12b2-48ec-b9f6-be5366c841a9}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

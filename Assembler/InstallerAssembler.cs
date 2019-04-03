@@ -6,6 +6,7 @@ using Assembler.Compiler;
 using Assembler.Compiler.Interfaces;
 using Assembler.Compiler.WinApp;
 using Assembler.InstallConfig;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -56,12 +57,15 @@ namespace Assembler
         private Config _config;
 
         public event EventHandler<AssemblerEventArgs> EventHandler;
+        private Iterator _saveVersionIterator;
 
         public InstallerAssembler(Config config)
         {
             _originalBuildPath = config.BuildPath;
             _config = (Config)config.Clone();
             _config.BuildPath = VersionPath.Generate(_config.AppName, _config.Version);
+
+            _saveVersionIterator = Iterator.Factory.Create(_saveVersion, 1);
         }
 
         private void _print(string msg)
@@ -124,31 +128,33 @@ namespace Assembler
             return $@"Output\{_config.AppName}\{_config.Version}\{(buildType == BuildType.Major ? "Major" : "Minor")}\{_generateFileNameByTemplate(buildType)}";
         }
 
+        private void _saveVersion()
+        {
+            _print("Копирование файлов сборки");
+
+            if (Directory.Exists(_config.BuildPath))
+                Directory.Delete(_config.BuildPath, true);
+            _copyToDir(_originalBuildPath, _config.BuildPath);
+            _assembleUninstaller();
+        }
+
         public void Assemble(BuildType buildType)
         {
             try
             {
-                var output = _generateOutputPath(buildType);
-
                 if (!Framework.Check(_config.FrameworkVer))
                     throw new Exception("Неизвестная версия .Net Framework");
 
                 if (!Framework.Exists(_config.FrameworkVer))
                     throw new Exception($@"Версия .Net Framework {_config.FrameworkVer} не найдена на компьютере");
 
+                var output = _generateOutputPath(buildType);
                 var dir = Path.GetDirectoryName(output);
 
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
 
-                _print("Копирование файлов сборки");
-
-                if (Directory.Exists(_config.BuildPath))
-                    Directory.Delete(_config.BuildPath, true);
-                _copyToDir(_originalBuildPath, _config.BuildPath);
-
-                if(buildType == BuildType.Major)
-                    _assembleUninstaller();
+                _saveVersionIterator.Do();
 
                 var compiler = _getCompiler(buildType);
   

@@ -23,4 +23,8 @@
 
   <ProjectExtensions><VisualStudio><UserProperties config_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="set libsFolder=$(ProjectDir)\$(OutDir)\Libs&#xD;&#xA;&#xD;&#xA;if not exist %libsFolder% (&#xD;&#xA;     mkdir %libsFolder%&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;del %libsFolder%\* /q&#xD;&#xA;&#xD;&#xA;copy /y /d  &quot;$(SolutionDir)\InstallerLib\$(OutDir)*.dll&quot; %libsFolder%&#xD;&#xA;" />
+  </Target>
+
 </Project>

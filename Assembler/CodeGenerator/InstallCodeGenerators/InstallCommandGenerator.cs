@@ -1,5 +1,5 @@
 ﻿using Assembler.InstallConfig;
-using Assembler.Substitute;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,12 +26,12 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                             stopCode);
         }
 
-        private static string _generateDeletedFilesList(IEnumerable<Assembler.Substitute.FileInfo> info)
+        private static string _generateDeletedFilesList(IEnumerable<Common.FileInfo> info)
         {
             return ListCodeGenerator.Generate(null, "string", info.Where(x => x.Status == FileStatus.Deleted).Select(x => StringGenerator.Generate(x.Path)));
         }
 
-        private static string _generateReplaceCommand(string stopCode, IEnumerable<Assembler.Substitute.FileInfo> info)
+        private static string _generateReplaceCommand(string stopCode, IEnumerable<Common.FileInfo> info)
         {
             return ObjectGenerator.Generate(
                             null,

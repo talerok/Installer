@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 
-namespace InstallerLib.Helpers
+namespace Common
 {
-    enum FileStatus
+    public enum FileStatus
     {
         Added,
         Deleted,
         Modified
     }
 
-    class FileInfo
+    public class FileInfo
     {
         public string Path { get; set; }
         public FileStatus Status { get; set; }
     }
 
-    static class FoldersSubstitute
+    public static class FoldersSubstitute
     {
         public static IEnumerable<FileInfo> Substitute(string path1, string path2)
         {

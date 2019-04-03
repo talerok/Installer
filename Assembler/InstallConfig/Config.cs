@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Common;
 
 namespace Assembler.InstallConfig
 {
@@ -52,7 +53,7 @@ namespace Assembler.InstallConfig
 
         public object Clone()
         {
-            return this.MemberwiseClone();
+            return this.CloneObject();
         }
     }
 }

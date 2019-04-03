@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace InstallerLib.Helpers
+namespace Common
 {
-    static class FilesComparer
+    public static class FilesComparer
     {
 
         private static string _checkMD5(string filename)
