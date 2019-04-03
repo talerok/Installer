@@ -61,7 +61,7 @@ namespace Assembler
         {
             _originalBuildPath = config.BuildPath;
             _config = (Config)config.Clone();
-            _config.BuildPath = $@"{_config.VersionsFolderPath}\{_config.Version}"; 
+            _config.BuildPath = VersionPath.Generate(_config.AppName, _config.Version);
         }
 
         private void _print(string msg)
@@ -76,35 +76,20 @@ namespace Assembler
                 compiler.AddLocalLib(lib);
         }
 
-        private ICompiler _getCompiler()
+        private ICompiler _getCompiler(BuildType buildType)
         {
-            ICompiler res;
-            switch (_config.Type)
-            {
-                case _simpleType:
-                    var appCodeInfo = new SimpleFormInstallCodeGenerator(_config).GetCode();
-                    res = new WinAppCompiler(_config.FrameworkVer, _namespaces, appCodeInfo.Code, appCodeInfo.Resources, _config.IconPath);
-                    break;
-                case _advancedType:
-                    var advCodeInfo = new AdvancedFormInstallCodeGenerator(_config).GetCode();
-                    res = new WinAppCompiler(_config.FrameworkVer, _namespaces, advCodeInfo.Code, advCodeInfo.Resources, _config.IconPath);
-                    break;
-                default:
-                    throw new Exception("Неизвестный тип (Type)");
-            }
+            var advCodeInfo = new AdvancedFormInstallCodeGenerator(_config, buildType).GetCode();
+            var res = new WinAppCompiler(_config.FrameworkVer, _namespaces, advCodeInfo.Code, advCodeInfo.Resources, _config.IconPath);
             _addLocalLibs(res);
             return res;
         }
 
         private void _assembleUninstaller()
         {
-            if (!string.IsNullOrEmpty(_config.ForVersion))
-                return;
-
             _print("Сборка деинсталятора");
             var unstallCode = new UninstallerCodeGenerator(_config);
             var uninstallerCompiler = new WinAppCompiler(_config.FrameworkVer, _namespaces, unstallCode.Generate(), new Dictionary<string, byte[]>(), _config.IconPath);
-            var path = $@"{_config.BuildPath}\{_config.UninstallerPath}";
+            var path = $@"{_config.BuildPath}\uninstaller.exe";
             var dirPath = Path.GetDirectoryName(path);
             if (!Directory.Exists(dirPath))
                 Directory.CreateDirectory(dirPath);
@@ -113,17 +98,45 @@ namespace Assembler
             uninstallerCompiler.Compile(path);
         }
 
-        public void Assemble()
+        private string _generateFileNameByTemplate(BuildType buildType)
+        {
+            var properties = _config.GetType().GetProperties();
+
+            string template = buildType == BuildType.Major ? _config.MajorConfig.FileNameTemplate : _config.MinorConfig.FileNameTemplate;
+
+            foreach(var property in properties)
+            {
+                if (property.PropertyType.Name != "String")
+                    continue;
+
+                var val = property.GetValue(_config) as string;
+                if (val == null)
+                    continue;
+
+                template = template.Replace($"[{property.Name}]", val);
+            }
+
+            return template;
+        }
+
+        private string _generateOutputPath(BuildType buildType)
+        {
+            return $@"Output\{_config.AppName}\{_config.Version}\{(buildType == BuildType.Major ? "Major" : "Minor")}\{_generateFileNameByTemplate(buildType)}";
+        }
+
+        public void Assemble(BuildType buildType)
         {
             try
             {
-                var dir = Path.GetDirectoryName(_config.OutputPath);
+                var output = _generateOutputPath(buildType);
 
                 if (!Framework.Check(_config.FrameworkVer))
                     throw new Exception("Неизвестная версия .Net Framework");
 
                 if (!Framework.Exists(_config.FrameworkVer))
                     throw new Exception($@"Версия .Net Framework {_config.FrameworkVer} не найдена на компьютере");
+
+                var dir = Path.GetDirectoryName(output);
 
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
@@ -134,12 +147,13 @@ namespace Assembler
                     Directory.Delete(_config.BuildPath, true);
                 _copyToDir(_originalBuildPath, _config.BuildPath);
 
-                _assembleUninstaller();
+                if(buildType == BuildType.Major)
+                    _assembleUninstaller();
 
-                var compiler = _getCompiler();
+                var compiler = _getCompiler(buildType);
   
-                _print($"Сборка {_config.OutputPath}");
-                compiler.Compile(_config.OutputPath);
+                _print($"Сборка {output}");
+                compiler.Compile(output);
                 _print("Сборка прошла успешно");
             }
             catch (CompilerException ex)

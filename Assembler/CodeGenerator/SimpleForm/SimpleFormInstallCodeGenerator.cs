@@ -11,6 +11,7 @@ namespace Assembler.CodeGenerator.SimpleForm
     public class SimpleFormInstallCodeGenerator
     {
         private Config _config;
+        private BuildType _buildType;
 
         private string _generateInstallProccesTextPring(string text, bool quotes = false) => quotes ? $@"InstallProccessTextBox.AppendText({StringGenerator.Generate(text)} + ""\n"");" : $@"InstallProccessTextBox.AppendText({text} + ""\n"");";
 
@@ -31,7 +32,7 @@ namespace Assembler.CodeGenerator.SimpleForm
 
 
 
-            if (!string.IsNullOrEmpty(_config.ForVersion))
+            if (_buildType == BuildType.Minor)
             {
                 res.AppendLine(@"if (installPath == null)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
@@ -41,12 +42,12 @@ namespace Assembler.CodeGenerator.SimpleForm
             }
             else
             {
-                if (_config.UseDefaultPath)
+                if (_config.MajorConfig.UseDefaultPath)
                     res.AppendLine("SelectPathButton.Enabled = false;");
 
                 res.AppendLine(@"if (installPath == null) {");
-                res.AppendLine($"pathTextBox.Text = {StringGenerator.Generate(_config.DefaultPath)};");
-                if(!String.IsNullOrEmpty(_config.DefaultPath))
+                res.AppendLine($"pathTextBox.Text = {StringGenerator.Generate(_config.MajorConfig.DefaultPath)};");
+                if(!String.IsNullOrEmpty(_config.MajorConfig.DefaultPath))
                     res.AppendLine("InstallButton.Enabled = true;");
 
                 res.AppendLine("} else {");
@@ -95,7 +96,7 @@ namespace Assembler.CodeGenerator.SimpleForm
         private string _generateInstallButtonClickMethod(IDictionary<string, byte[]> resources)
         {
             var code = new StringBuilder("_blockButtons();");
-            code.AppendLine(InstallProcessGenerator.Generate(_config, resources, "pathTextBox.Text", "true", "true", "true", "InstallProcessEventHandler"));
+            code.AppendLine(InstallProcessGenerator.Generate(_config, _buildType, resources, "pathTextBox.Text", "true", "true", "true", "InstallProcessEventHandler"));
             code.AppendLine("CloseButton.Enabled = true;");
 
             return MethodGenerator.Generate(new string[] { "private" }, "void", "InstallButton_Click", new string[] { "object sender", "EventArgs e" }, code.ToString());
@@ -181,8 +182,8 @@ namespace Assembler.CodeGenerator.SimpleForm
                 formClassBody.AppendLine(InstallProcessGenerator.GenerateAuxiliaryCode("InstallProcessEventHandler"));
                 formClassBody.AppendLine(_generateInstallEventMethod());
                 formClassBody.AppendLine(_generatePrepareFormMethod());
-                formClassBody.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_versionCheck", _config));
-                formClassBody.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(_config, "_checkAdmin"));
+                formClassBody.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_versionCheck", _config, _buildType));
+                formClassBody.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(_config, _buildType, "_checkAdmin"));
                 formClassBody.AppendLine(_generateFormConstructor());
                 formClassBody.AppendLine(_generateSelectPathButtonClickMethod());
                 formClassBody.AppendLine(_generateCloseButtonClickMethod());
@@ -198,9 +199,10 @@ namespace Assembler.CodeGenerator.SimpleForm
             }
         }
 
-        public SimpleFormInstallCodeGenerator(Config config)
+        public SimpleFormInstallCodeGenerator(Config config, BuildType buildType)
         {
             _config = config;
+            _buildType = buildType;
         }
     }
 }

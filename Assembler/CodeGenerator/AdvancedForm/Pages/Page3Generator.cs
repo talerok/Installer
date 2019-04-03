@@ -23,12 +23,12 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
             return MethodGenerator.Generate(new string[] { "private" }, "void", "_showNextPage", new string[] { "string information", "bool blockButton" }, res.ToString());
         }
 
-        private static (string Code, Dictionary<string, byte[]> Resources) _generateInstallProcessMethod(Config config)
+        private static (string Code, Dictionary<string, byte[]> Resources) _generateInstallProcessMethod(Config config, BuildType buildType)
         {
             var resources = new Dictionary<string, byte[]>();
 
             var res = new StringBuilder();
-            res.AppendLine(InstallProcessGenerator.Generate(config, resources, "Path", "DesktopShortCuts", "StartMenuShortCuts", "StartUp", "InstallProcessEventHandler", "_prevent"));
+            res.AppendLine(InstallProcessGenerator.Generate(config, buildType, resources, "Path", "DesktopShortCuts", "StartMenuShortCuts", "StartUp", "InstallProcessEventHandler", "_prevent"));
 
 
             return (MethodGenerator.Generate(new string[] { "private" }, "void", "_installProcess", new string[] {}, res.ToString()),
@@ -93,7 +93,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
             return MethodGenerator.Generate(new string[] { "public" }, "", "Page3", new string[] { }, res.ToString());
         }
 
-        public static (string Code, Dictionary<string, byte[]> Resources) Generate(Config config)
+        public static (string Code, Dictionary<string, byte[]> Resources) Generate(Config config, BuildType buildType)
         {
             var res = new StringBuilder();
 
@@ -198,7 +198,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
             res.AppendLine(InstallProcessGenerator.GenerateAuxiliaryCode("InstallProcessEventHandler"));
             res.AppendLine(_generateInstallEventMethod(config));
 
-            var instProcess = _generateInstallProcessMethod(config);
+            var instProcess = _generateInstallProcessMethod(config, buildType);
             res.AppendLine(instProcess.Code);
 
             res.AppendLine(_generateStartInstallMethod());

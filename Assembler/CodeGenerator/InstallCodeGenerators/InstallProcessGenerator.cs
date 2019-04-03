@@ -65,7 +65,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             return MethodGenerator.Generate(modifiers, "void", methodName, new string[] { "object sender", $"InstallProcessEventArgs {argsName}" }, body);
         }
 
-        public static string Generate(Config config, IDictionary<string,byte[]> resources, string installPathCode, string desktopShortCutsCode, string startMenuShortCutsCode, string startUpCode, string eventHandler, string stopInstallCode = null)
+        public static string Generate(Config config, BuildType buildType, IDictionary<string,byte[]> resources, string installPathCode, string desktopShortCutsCode, string startMenuShortCutsCode, string startUpCode, string eventHandler, string stopInstallCode = null)
         {
             var code = new StringBuilder();
             code.AppendLine($@"var installPath = {installPathCode};");
@@ -73,9 +73,9 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             var commandsCode = new List<string>();
 
             if (!string.IsNullOrEmpty(stopInstallCode))
-                commandsCode.Add(InstallCommandGenerator.Generate(config, ref resources, $"() => {stopInstallCode}" )); // () => {stopInstallCode} - функция отмены разархивирования
+                commandsCode.Add(InstallCommandGenerator.Generate(config, buildType, ref resources, $"() => {stopInstallCode}" )); // () => {stopInstallCode} - функция отмены разархивирования
             else
-                commandsCode.Add(InstallCommandGenerator.Generate(config, ref resources, $"null"));
+                commandsCode.Add(InstallCommandGenerator.Generate(config, buildType, ref resources, $"null"));
             commandsCode.Add(ObjectGenerator.Generate(null, "SetVersion", StringGenerator.Generate(config.Version), "installPath"));
 
 
@@ -107,6 +107,7 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             code.AppendLine(_generateEventInvoke(eventHandler, "Message", "Запуск установки", true));
 
             var tryBody = new StringBuilder();
+
             tryBody.AppendLine($"commands = {ListCodeGenerator.Generate(null, "IInstallCommand", commandsCode)};");
 
             tryBody.AppendLine(ObjectGenerator.Generate("pCheck", "GetPath", StringGenerator.Generate(config.AppName)));
@@ -117,18 +118,23 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                 StringGenerator.Generate(config.AppName), 
                 StringGenerator.Generate(config.Version),
                 StringGenerator.Generate(config.CompanyName),
-                $"installPath + {StringGenerator.Generate($@"\{config.UninstallerPath}")}"
+                $"installPath + {StringGenerator.Generate($@"\uninstaller.exe")}"
             )});");
             tryBody.AppendLine("}");
 
-            tryBody.AppendLine($"if({desktopShortCutsCode})");
-            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.DesktopShortCuts, "Desktop")});");
+            if (buildType == BuildType.Major)
+            {
 
-            tryBody.AppendLine($"if({startMenuShortCutsCode})");
-            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.StartMenuShortCuts, "StartMenu")});");
+                tryBody.AppendLine($"if({desktopShortCutsCode})");
+                tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.MajorConfig.ShortCutsConfig.DesktopShortCuts, "Desktop")});");
 
-            tryBody.AppendLine($"if({startUpCode})");
-            tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.AutoStart, "AutoStart")});");
+                tryBody.AppendLine($"if({startMenuShortCutsCode})");
+                tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.MajorConfig.ShortCutsConfig.StartMenuShortCuts, "StartMenu")});");
+
+                tryBody.AppendLine($"if({startUpCode})");
+                tryBody.AppendLine($@"commands.Add({_generateShortCutCommand(config, config.MajorConfig.ShortCutsConfig.AutoStart, "AutoStart")});");
+
+            }
 
             tryBody.AppendLine(ForGenerator.Generate("", "step < commands.Count", "step++", forBody.ToString()));
             tryBody.AppendLine(_generateEventInvoke(eventHandler, "Message", "Финализация установки", true));
@@ -156,9 +162,12 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             return code.ToString();
         }
 
-        public static string GenerateAdminCheckMethod(Config config, string methodName)
+        public static string GenerateAdminCheckMethod(Config config, BuildType buildType, string methodName)
         {
             var body = new StringBuilder();
+
+            if(buildType == BuildType.Minor)
+                return MethodGenerator.Generate(new string[] { "private" }, "void", methodName, new string[] { }, "");
 
             body.AppendLine(ObjectGenerator.Generate("adminCheck", "AdminCheck"));
             body.AppendLine($@"if(!adminCheck.Check())");
@@ -166,14 +175,16 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
 
             var res = new StringBuilder();
 
-            if (config.AutoStart.Any() || config.DesktopShortCuts.Any() || config.StartMenuShortCuts.Any()) // Нужны права админа чтобы создавать ярлыки
+            if (config.MajorConfig.ShortCutsConfig.AutoStart.Any() ||
+                config.MajorConfig.ShortCutsConfig.DesktopShortCuts.Any() ||
+                config.MajorConfig.ShortCutsConfig.StartMenuShortCuts.Any()) // Нужны права админа чтобы создавать ярлыки
             {
                 res.AppendLine(body.ToString());
             }
             else
             {
                 res.AppendLine(ObjectGenerator.Generate("pCheck", "GetPath", StringGenerator.Generate(config.AppName))); // Нужны права админа при первой установки
-                res.AppendLine("if(pCheck.GetInfo() == null) {"); // т.е если нет информации по пути установки = программа не была установлена
+                res.AppendLine("if(pCheck.GetInfo() == null) {"); // т.е если нет информации по пути установки -> программа не была установлена
                 res.AppendLine(body.ToString());
                 res.AppendLine("}");
             }
@@ -181,20 +192,20 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
             return MethodGenerator.Generate(new string[] { "private" }, "void", methodName, new string[] { }, res.ToString());
         }
 
-        public static string GenerateVersionCheckMethod(string methodName, Config config)
+        public static string GenerateVersionCheckMethod(string methodName, Config config, BuildType buildType)
         {
             var res = new StringBuilder();
             res.AppendLine(ObjectGenerator.Generate("versionCheck", "GetVersion", StringGenerator.Generate(config.AppName)));
             res.AppendLine($@"var currentVersion = versionCheck.GetInfo();");
-            if (string.IsNullOrEmpty(config.ForVersion))
+            if (buildType == BuildType.Major)
             {
                 res.AppendLine($@"if(currentVersion != null && currentVersion.CompareTo(""{config.Version}"") != -1)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена более поздняя версия программы (текущая версия: "" + currentVersion + "", версия установщика: {config.Version})"""));
             }
             else
             {
-                res.AppendLine($@"if(currentVersion == null || currentVersion != {StringGenerator.Generate(config.ForVersion)})");
-                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена неподходящая версия программы (текущая версия: "" + (currentVersion != null ? currentVersion : ""отсутствует"") + "", версия установщика: {config.ForVersion})"""));
+                res.AppendLine($@"if(currentVersion == null || currentVersion != {StringGenerator.Generate(config.MinorConfig.ForVersion)})");
+                res.AppendLine(ThrowGenerator.Generate("Exception", $@"""Установлена неподходящая версия программы (текущая версия: "" + (currentVersion != null ? currentVersion : ""отсутствует"") + "", версия установщика: {config.MinorConfig.ForVersion})"""));
             }
            
             return MethodGenerator.Generate(new string[] { "private" }, "void", "_checkVersion", new string[] { }, res.ToString());

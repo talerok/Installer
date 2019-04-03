@@ -16,7 +16,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             return StringGenerator.Generate($"Мастер установки {config.AppName} {config.Version}");
         }
 
-        private static string _generatePrepareFormMethod(Config config)
+        private static string _generatePrepareFormMethod(Config config, BuildType buildType)
         {
             var res = new StringBuilder();
             res.AppendLine($"this.Text = {_generateLabel(config)};");
@@ -42,7 +42,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(config.AppName)));
             res.AppendLine($@"var installPath = pathCheck.GetInfo();");
 
-            if (!string.IsNullOrEmpty(config.ForVersion))
+            if (buildType == BuildType.Minor)
             {
                 res.AppendLine(@"if (installPath == null)");
                 res.AppendLine(ThrowGenerator.Generate("Exception", StringGenerator.Generate("не найден каталог установки")));
@@ -51,11 +51,11 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             }
             else
             {
-                if (config.UseDefaultPath)
+                if (config.MajorConfig.UseDefaultPath)
                     res.AppendLine("page2.BlockSelectPath();");
 
                 res.AppendLine(@"if (installPath == null) {");
-                res.AppendLine($"page2.Path = {StringGenerator.Generate(config.DefaultPath)};");
+                res.AppendLine($"page2.Path = {StringGenerator.Generate(config.MajorConfig.DefaultPath)};");
                 res.AppendLine("} else {");
                 res.AppendLine("page2.Path = installPath;");
                 res.AppendLine("page2.BlockSelectPath();");
@@ -85,7 +85,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             return MethodGenerator.Generate(new string[] { "public" }, "", "Form1", new string[] { }, res.ToString());
         }
 
-        public static string Generate(Config config)
+        public static string Generate(Config config, BuildType buildType)
         {
             var res = new StringBuilder();
 
@@ -130,12 +130,12 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
                                 }
                             }");
 
-            res.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_checkVersion", config));
-            res.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(config, "_checkAdmin"));
+            res.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_checkVersion", config, buildType));
+            res.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(config, buildType, "_checkAdmin"));
 
             res.AppendLine($@"private string _programName = {_generateLabel(config)};");
             res.AppendLine($@"private string _programInformation = {StringGenerator.Generate(config.Description, false)};");
-            res.AppendLine(_generatePrepareFormMethod(config));
+            res.AppendLine(_generatePrepareFormMethod(config, buildType));
             res.AppendLine(_generateConstructor());
 
                             

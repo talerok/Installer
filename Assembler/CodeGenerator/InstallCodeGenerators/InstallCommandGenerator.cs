@@ -42,9 +42,9 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                             stopCode);
         }
 
-        public static string Generate(Config config, ref IDictionary<string, byte[]> resources, string stopCode)
+        public static string Generate(Config config, BuildType buildType, ref IDictionary<string, byte[]> resources, string stopCode)
         {
-            if (string.IsNullOrEmpty(config.ForVersion))
+            if (buildType == BuildType.Major)
             {
                 using (var memoryStream = new MemoryStream())
                 {
@@ -64,9 +64,9 @@ namespace Assembler.CodeGenerator.InstallCodeGenerators
                         Directory.Delete("buffer", true);
                     Directory.CreateDirectory("buffer");
 
-                    var prevVersionFolder = $@"{config.VersionsFolderPath}\{config.ForVersion}";
+                    var prevVersionFolder = VersionPath.Generate(config.AppName, config.MinorConfig.ForVersion);
                     if (!Directory.Exists(prevVersionFolder))
-                        throw new CodeGeneratorException($"Не найдена папка версии {config.ForVersion} ({prevVersionFolder})");
+                        throw new CodeGeneratorException($"Не найдена папка версии {config.MinorConfig.ForVersion} ({prevVersionFolder})");
 
                     var filesInfo = FoldersSubstitute.Substitute(prevVersionFolder, config.BuildPath);
 

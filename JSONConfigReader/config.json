@@ -1,40 +1,39 @@
 ﻿{
-  "OutputPath": "D:\\InstallTest\\installer.exe",
   "IconPath": "C:\\Users\\akurochkin\\Desktop\\icon.ico",
   "FrameworkVer": "3.5",
-  "Type": "advanced",
+
   "AppName": "Assembler",
   "CompanyName": "Сигма",
+  "Version": "1.0.0",
+
   "Description": "Installer Assembler",
   "AfterInstallMessage": "",
-  "UseDefaultPath": false,
-  "DefaultPath": "",
 
-  "Version": "1.0.0",
-  "ForVersion": null,
+  "MajorConfig": {
+    "FileNameTemplate": "[AppName]-[Version].exe",
+    "UseDefaultPath": false,
+    "DefaultPath": "",
+    "ShortCutsConfig": {
+      "DesktopShortCuts": [
 
-  "UninstallerPath": "uninstaller.exe",
+      ],
+      "StartMenuShortCuts": [
+
+      ],
+      "AutoStart": [
+
+      ]
+    }
+  },
+
+  "MinorConfig": {
+    "FileNameTemplate": "",
+    "ForVersion": ""
+  },
+
   "BuildPath": "C:\\Users\\akurochkin\\Desktop\\Assembler",
-  "VersionsFolderPath": "Versions",
 
   "StartAfterInstall": [
 
-  ],
-  "DesktopShortCuts": [
-
-  ],
-  "StartMenuShortCuts": [
-    {
-      "Name": "Assembler\\Assembler",
-      "FilePath": "Assembler.bat"
-    },
-    {
-      "Name": "Assembler\\Config",
-      "FilePath": "config.json"
-    }
-  ],
-  "AutoStart": [
-
   ]
-
 }

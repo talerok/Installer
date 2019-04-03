@@ -8,7 +8,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
 {
     static class Page2Generator
     {
-        public static string Generate(Config config)
+        public static string Generate(Config config, BuildType buildType)
         {
             var res = new StringBuilder();
 
@@ -94,7 +94,6 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                                 // 
                                 this.pathTextBox.Location = new System.Drawing.Point(14, 18);
                                 this.pathTextBox.Name = ""pathTextBox"";
-                                this.pathTextBox.ReadOnly = true;
                                 this.pathTextBox.Size = new System.Drawing.Size(362, 20);
                                 this.pathTextBox.TabIndex = 5;
                                 // 
@@ -221,7 +220,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
 
             int _checkboxedCount = 0;
 
-            if (!config.DesktopShortCuts.Any())
+            if (buildType == BuildType.Minor || !config.MajorConfig.ShortCutsConfig.DesktopShortCuts.Any())
                 configureCheckBoxesMethodBody.AppendLine("DesktopShortCutCheckBox.Visible = false;");
             else
             {
@@ -229,7 +228,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                 _checkboxedCount++;
             }
 
-            if (!config.StartMenuShortCuts.Any())
+            if (buildType == BuildType.Minor || !config.MajorConfig.ShortCutsConfig.StartMenuShortCuts.Any())
                 configureCheckBoxesMethodBody.AppendLine("StartMenuShortCutCheckBox.Visible = false;");
             else
             {
@@ -237,7 +236,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                 _checkboxedCount++;
             }
 
-            if (!config.AutoStart.Any())
+            if (buildType == BuildType.Minor || !config.MajorConfig.ShortCutsConfig.AutoStart.Any())
                 configureCheckBoxesMethodBody.AppendLine("StartUpCheckBox.Visible = false;");
             else
             {
@@ -281,7 +280,9 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
                             
                                 if (String.IsNullOrEmpty(Path))
                                     NextButton.Enabled = false;
-            
+                                
+                                pathTextBox.ReadOnly = true;
+
                                 SelectPathButton.Click += (o, e) =>
                                 {
                                     using (var dialog = new FolderBrowserDialog())

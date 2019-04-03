@@ -78,6 +78,7 @@ namespace Assembler.CodeGenerator.Uninstaller
                                                 this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
                                                 this.Text = ""Form1"";
                                                 this.ResumeLayout(false);
+                                                this.Visible = false;
 
                                             }
 
@@ -197,13 +198,26 @@ namespace Assembler.CodeGenerator.Uninstaller
         private string _generateConstructor()
         {
             var res = new StringBuilder();
-            res.AppendLine(ObjectGenerator.Generate("uninstaller", "Uninstaller", StringGenerator.Generate(_config.AppName)));
 
-            res.AppendLine("InitializeComponent();");
-            res.AppendLine("this.FormClosing += (o, e) => { e.Cancel = _preventClosing; };");
-            res.AppendLine("_check(uninstaller);");  
-            res.AppendLine($"this.Text = {StringGenerator.Generate($" Мастер удаления {_config.AppName}")};");
-            res.AppendLine("this.Shown += (o, e) => { _process(uninstaller); };");
+            var tryBody = new StringBuilder();
+
+            tryBody.AppendLine(ObjectGenerator.Generate("uninstaller", "Uninstaller", StringGenerator.Generate(_config.AppName)));
+
+            tryBody.AppendLine("InitializeComponent();");
+            tryBody.AppendLine("this.FormClosing += (o, e) => { e.Cancel = _preventClosing; };");
+            tryBody.AppendLine("_check(uninstaller);");
+            tryBody.AppendLine($"this.Text = {StringGenerator.Generate($" Мастер удаления {_config.AppName}")};");
+            tryBody.AppendLine("this.Shown += (o, e) => { _process(uninstaller); };");
+            tryBody.AppendLine("this.Visible = true;");
+            res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
+
+            var catchBody = new StringBuilder();
+
+            catchBody.AppendLine(ErrorMessageBoxGenerator.Generate(StringGenerator.Generate("Ошибка удаления программы"), "ex.Message"));
+            catchBody.AppendLine("Environment.Exit(0);");
+
+            res.AppendLine(CatchGenerator.Generate("Exception", "ex", catchBody.ToString()));
+
             return MethodGenerator.Generate(new string[] { "public" }, "", "Form1", new string[] { }, res.ToString());
         }
 
