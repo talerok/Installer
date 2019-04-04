@@ -21,7 +21,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
         private static string _generatePrepareFormMethod(Config config, BuildType buildType)
         {
             var res = new StringBuilder();
-            res.AppendLine($"this.Text = {_generateLabel(config)};");
+            res.AppendLine($"this.Text = {StringGenerator.Generate(_generateLabel(config))};");
 
             //----------------
             res.AppendLine(ObjectGenerator.Generate("page1", "Page1", "_programName", "_programInformation"));
@@ -134,7 +134,7 @@ namespace Assembler.CodeGenerator.AdvancedForm.Form
             res.AppendLine(InstallProcessGenerator.GenerateVersionCheckMethod("_checkVersion", config, buildType));
             res.AppendLine(InstallProcessGenerator.GenerateAdminCheckMethod(config, buildType, "_checkAdmin"));
 
-            res.AppendLine($@"private string _programName = {_generateLabel(config)};");
+            res.AppendLine($@"private string _programName = {StringGenerator.Generate(_generateLabel(config))};");
             res.AppendLine($@"private string _programInformation = {StringGenerator.Generate(config.Description, false)};");
             res.AppendLine(_generatePrepareFormMethod(config, buildType));
             res.AppendLine(_generateConstructor());

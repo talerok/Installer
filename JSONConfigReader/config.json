@@ -4,7 +4,7 @@
 
   "AppName": "Assembler",
   "CompanyName": "Сигма",
-  "Version": "1.0.0",
+  "Version": "1.0.1",
 
   "Description": "Installer Assembler",
   "AfterInstallMessage": "",
@@ -18,7 +18,7 @@
 
       ],
       "StartMenuShortCuts": [
-
+        
       ],
       "AutoStart": [
 
@@ -27,13 +27,13 @@
   },
 
   "MinorConfig": {
-    "FileNameTemplate": "",
-    "ForVersion": ""
+    "FileNameTemplate": "[AppName]-[ForVersion]-[Version].exe",
+    "ForVersion": "1.0.0"
   },
 
   "BuildPath": "C:\\Users\\akurochkin\\Desktop\\Assembler",
 
   "StartAfterInstall": [
-
+   
   ]
 }

@@ -13,7 +13,9 @@ namespace Assembler.CodeGenerator.AdvancedForm.Pages
         {
             var res = new StringBuilder();
 
-            res.AppendLine($@"protected override void Dispose(bool disposing)
+            res.AppendLine($@"private System.ComponentModel.IContainer components = null;
+
+                            protected override void Dispose(bool disposing)
                             {{
                                 if (disposing && (components != null))
                                 {{

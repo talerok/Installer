@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using Common;
 
 namespace Assembler.InstallConfig
 {
+    [Serializable]
     public class ShortCutConfig
     {
         public string Name { get; set; }
         public string FilePath { get; set; }
     }
 
+    [Serializable]
     public class ShortCutsConfig
     {
         public List<ShortCutConfig> DesktopShortCuts { get; set; }
@@ -18,6 +22,7 @@ namespace Assembler.InstallConfig
         public List<ShortCutConfig> AutoStart { get; set; }
     }
 
+    [Serializable]
     public class MajorConfig
     {
         public string FileNameTemplate { get; set; }
@@ -26,12 +31,14 @@ namespace Assembler.InstallConfig
         public ShortCutsConfig ShortCutsConfig { get; set; }
     }
 
+    [Serializable]
     public class MinorConfig
     {
         public string FileNameTemplate { get; set; }
         public string ForVersion { get; set; }
     }
 
+    [Serializable]
     public class Config : ICloneable
     {
         public string IconPath { get; set; }
@@ -53,7 +60,13 @@ namespace Assembler.InstallConfig
 
         public object Clone()
         {
-            return this.CloneObject();
+            var formater = new BinaryFormatter();
+            using (var stream = new MemoryStream())
+            {
+                formater.Serialize(stream, this);
+                stream.Position = 0;
+                return formater.Deserialize(stream);
+            }
         }
     }
 }

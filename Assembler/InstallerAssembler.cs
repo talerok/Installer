@@ -103,27 +103,37 @@ namespace Assembler
             uninstallerCompiler.Compile(path);
         }
 
-        private string _generateFileNameByTemplate(BuildType buildType)
+        private string _formatTemplate(string template, object obj)
         {
-            var properties = _config.GetType().GetProperties().Union(
-                buildType == BuildType.Major ? _config.MajorConfig.GetType().GetProperties() 
-                : _config.MinorConfig.GetType().GetProperties());
+            var properties = obj.GetType().GetProperties();
+            var res = template;
 
-            string template = buildType == BuildType.Major ? _config.MajorConfig.FileNameTemplate : _config.MinorConfig.FileNameTemplate;
-
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 if (property.PropertyType.Name != "String")
                     continue;
 
-                var val = property.GetValue(_config) as string;
+                var val = property.GetValue(obj) as string;
                 if (val == null)
                     continue;
 
-                template = template.Replace($"[{property.Name}]", val);
+                res = res.Replace($"[{property.Name}]", val);
             }
+            return res;
+        }
 
-            return template;
+        private string _generateFileNameByTemplate(BuildType buildType)
+        {
+            var res = buildType == BuildType.Major ? _config.MajorConfig.FileNameTemplate : _config.MinorConfig.FileNameTemplate;
+
+            res = _formatTemplate(res, _config);
+
+            if (buildType == BuildType.Major)
+                res = _formatTemplate(res, _config.MajorConfig);
+            else
+                res = _formatTemplate(res, _config.MinorConfig);
+           
+            return res;
         }
 
         private string _generateOutputPath(BuildType buildType)

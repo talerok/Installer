@@ -24,7 +24,7 @@ namespace Assembler.CodeGenerator.SimpleForm
         {
             var res = new StringBuilder();
             var formName = Resources.InstallerName.GetFormated($@"{_config.AppName} {_config.Version}");
-            res.AppendLine($"this.Text = {formName};");
+            res.AppendLine($"this.Text = {StringGenerator.Generate(formName)};");
 
             res.AppendLine(ObjectGenerator.Generate("pathCheck", "GetPath", StringGenerator.Generate(_config.AppName)));
             res.AppendLine($@"var installPath = pathCheck.GetInfo();");

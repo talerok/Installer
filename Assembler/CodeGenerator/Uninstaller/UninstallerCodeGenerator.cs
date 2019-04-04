@@ -193,7 +193,7 @@ namespace Assembler.CodeGenerator.Uninstaller
             tryBody.AppendLine("InitializeComponent();");
             tryBody.AppendLine("this.FormClosing += (o, e) => { e.Cancel = _preventClosing; };");
             tryBody.AppendLine("_check(uninstaller);");
-            tryBody.AppendLine($"this.Text = {StringGenerator.Generate(Resources.UninstallerName.GetFormated(_config.AppName))});");
+            tryBody.AppendLine($"this.Text = {StringGenerator.Generate(Resources.UninstallerName.GetFormated(_config.AppName))};");
             tryBody.AppendLine("this.Shown += (o, e) => { _process(uninstaller); };");
             tryBody.AppendLine("this.Visible = true;");
             res.AppendLine(TryGenerator.Generate(tryBody.ToString()));
