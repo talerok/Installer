@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    static class ExceptionGenerator
+    public static class ExceptionGenerator
     {
         public static string Generate(string constructor, params string[] args)
         {

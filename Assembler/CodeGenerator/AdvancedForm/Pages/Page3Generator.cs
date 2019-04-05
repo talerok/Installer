@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Localization;
+using CodeGeneration.Components;
 
 namespace Assembler.CodeGenerator.AdvancedForm.Pages
 {

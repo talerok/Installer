@@ -1,4 +1,6 @@
 ﻿using Assembler.InstallConfig;
+using CodeGeneration;
+using CodeGeneration.Components;
 using Common;
 using Localization;
 using System;

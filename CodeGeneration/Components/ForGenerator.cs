@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    class ForGenerator
+    public static class ForGenerator
     {
         public static string Generate(string a, string b, string c, string body)
         {
             var res = new StringBuilder();
             res.AppendLine($"for({a};{b};{c}) {{");
             res.AppendLine(body);
-            res.AppendLine("}");
+            res.Append("}");
             return res.ToString();
         }
     }

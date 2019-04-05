@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    static class ObjectGenerator
+    public static class ObjectGenerator
     {
         public static string Generate(string name, string constructor, params string[] args)
         {
@@ -16,7 +16,7 @@ namespace Assembler.CodeGenerator
                 res.Append(string.Join(",", args));
 
             if (name != null)
-                res.AppendLine(");");
+                res.Append(");");
             else
                 res.Append(")");
             return res.ToString();

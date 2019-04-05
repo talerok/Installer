@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    class ThrowGenerator
+    public static class ThrowGenerator
     {
         public static string Generate(string exceptionClass, params string[] prms)
         {

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    class ClassGenerator
+    public static class ClassGenerator
     {
         public static string Generate(IEnumerable<string> modifiers, string name, string body, params string[] parents)
         {
@@ -14,7 +14,7 @@ namespace Assembler.CodeGenerator
                 res.Append($": {string.Join(", ", parents)}");
             res.AppendLine("{");
             res.AppendLine(body);
-            res.AppendLine("}");
+            res.Append("}");
             return res.ToString();
         }
     }

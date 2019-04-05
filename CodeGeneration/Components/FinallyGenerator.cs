@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    static class TryGenerator
+    public static class FinallyGenerator
     {
         public static string Generate(string body)
         {
             var res = new StringBuilder();
-            res.AppendLine("try {");
+            res.AppendLine("finally {");
             res.AppendLine(body);
-            res.AppendLine("}");
+            res.Append("}");
             return res.ToString();
         }
     }

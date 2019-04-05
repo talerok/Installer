@@ -1,4 +1,5 @@
-﻿using Localization;
+﻿using CodeGeneration.Components;
+using Localization;
 using System;
 using System.Collections.Generic;
 using System.Text;

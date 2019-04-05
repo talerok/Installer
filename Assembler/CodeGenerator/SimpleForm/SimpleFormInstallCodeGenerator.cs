@@ -1,6 +1,8 @@
 ﻿using Assembler.CodeGenerator.Form;
 using Assembler.CodeGenerator.InstallCodeGenerators;
 using Assembler.InstallConfig;
+using CodeGeneration;
+using CodeGeneration.Components;
 using Common;
 using Localization;
 using System;

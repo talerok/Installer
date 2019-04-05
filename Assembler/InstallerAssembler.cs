@@ -6,6 +6,7 @@ using Assembler.Compiler;
 using Assembler.Compiler.Interfaces;
 using Assembler.Compiler.WinApp;
 using Assembler.InstallConfig;
+using CodeGeneration;
 using Common;
 using Localization;
 using System;

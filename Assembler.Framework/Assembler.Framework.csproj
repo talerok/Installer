@@ -51,6 +51,10 @@
       <Project>{edf2eb51-c17a-4c70-874e-bb8d6f2335b2}</Project>
       <Name>Assembler</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CodeGeneration\CodeGeneration.csproj">
+      <Project>{2cdf5e77-6ebe-4e28-80a6-527c5611810d}</Project>
+      <Name>CodeGeneration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JSONConfigReader\JSONConfigReader.csproj">
       <Project>{3e6b14a9-4dc0-4c17-962c-1304719c1a66}</Project>
       <Name>JSONConfigReader</Name>

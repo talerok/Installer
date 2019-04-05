@@ -1,6 +1,7 @@
 ﻿using Assembler.CodeGenerator;
 using Assembler.CodeGenerator.Form;
 using Assembler.Compiler.Interfaces;
+using CodeGeneration;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;

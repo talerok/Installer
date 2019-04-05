@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    class ResourceResolverGenerator
+    public static class ResourceResolverGenerator
     {
         public static (string MethodCode, string InMainCode) Generate(string nmsp, IEnumerable<string> libs)
         {
@@ -13,15 +13,15 @@ namespace Assembler.CodeGenerator
             var methodCodeRes = new StringBuilder();
             var inMainCodeRes = "AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(_resolveAssembly);";
 
-            getResxMethodBody.Append($@"System.Resources.ResourceManager rm = new System.Resources.ResourceManager(""{nmsp}.g"", Assembly.GetExecutingAssembly());");
-            getResxMethodBody.AppendLine(@"return rm.GetObject(name);");
+            getResxMethodBody.AppendLine($@"System.Resources.ResourceManager rm = new System.Resources.ResourceManager(""{nmsp}.g"", Assembly.GetExecutingAssembly());");
+            getResxMethodBody.Append(@"return rm.GetObject(name);");
 
             foreach(var lib in libs)
             {
                 resolveMethodBody.AppendLine($@"if(args.Name.Contains(""{lib}""))");
                 resolveMethodBody.AppendLine($@"return Assembly.Load((byte[])_getResxByName(""{lib}""));");
             }
-            resolveMethodBody.AppendLine("return null;");
+            resolveMethodBody.Append("return null;");
 
             methodCodeRes.AppendLine(MethodGenerator.Generate(new string[] {"private", "static"}, "object", "_getResxByName", new string[] {"string name"}, getResxMethodBody.ToString()));
             methodCodeRes.AppendLine(MethodGenerator.Generate(new string[] { "private", "static" }, "Assembly", "_resolveAssembly", new string[] { "object sender", "ResolveEventArgs args" }, resolveMethodBody.ToString()));

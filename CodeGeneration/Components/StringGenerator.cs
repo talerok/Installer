@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Assembler.CodeGenerator
+namespace CodeGeneration.Components
 {
-    class StringGenerator
+    public static class StringGenerator
     {
         public static string Generate(string body, bool withDot = true)
         {
