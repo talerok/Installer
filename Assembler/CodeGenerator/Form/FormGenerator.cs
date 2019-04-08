@@ -6,6 +6,25 @@ using System.Text;
 
 namespace Assembler.CodeGenerator.Form
 {
+    public class FormGlobal
+    {
+        public string NameSpace { get; }
+        public IEnumerable<string> NameSpaces { get; }
+        public string ClassName { get; }
+        public string ClassCode { get; }
+        public string MainCode { get; }
+        
+        public FormGlobal(IEnumerable<string> namespaces, string nameSpace, string className, string classCode, string mainCode)
+        {
+            NameSpace = nameSpace;
+            NameSpaces = namespaces;
+            ClassCode = classCode;
+            ClassName = className;
+            MainCode = mainCode;
+        }
+    }
+
+
     class FormGenerator
     {
         private List<string> _nameSpaces = new List<string> {
@@ -35,35 +54,17 @@ namespace Assembler.CodeGenerator.Form
 
         public string Generate()
         {
-            try
-            {
-                var res = new StringBuilder();
+            var libResolveCode = ResourceResolverGenerator.Generate(_rootNameSpace, _localLibs.Keys);
 
-                var libResolveCode = ResourceResolverGenerator.Generate(_rootNameSpace, _localLibs.Keys);
+            var classBody = new StringBuilder();
+            classBody.AppendLine(_code);
+            classBody.AppendLine(libResolveCode.MethodCode);
 
-                res.AppendLine(NameSpacesGenerator.Generate(_nameSpaces));
+            var mainBody = new StringBuilder();
 
-                var mainBody = new StringBuilder();
-                mainBody.AppendLine(libResolveCode.InMainCode);
-                mainBody.AppendLine("Application.EnableVisualStyles();");
-                mainBody.AppendLine("Application.SetCompatibleTextRenderingDefault(false);");
-                mainBody.AppendLine("Application.Run(new Form1());");
+            var global = new FormGlobal(_nameSpaces, _rootNameSpace, "Programm", classBody.ToString(), libResolveCode.InMainCode);
 
-                var classBody = new StringBuilder();
-                classBody.AppendLine(_code);
-                classBody.AppendLine(libResolveCode.MethodCode);
-                classBody.AppendLine("[STAThread]");
-                classBody.AppendLine(MethodGenerator.Generate(new string[] { "static" }, "void", "Main", new string[] { }, mainBody.ToString()));
-
-
-                res.AppendLine(NameSpaceGenerator.Generate(_rootNameSpace,
-                    ClassGenerator.Generate(new string[] { "public", "static" }, "Program", classBody.ToString())));
-                return res.ToString();
-            }
-            catch (Exception ex)
-            {
-                throw new CodeGeneratorException(ex.Message);
-            }
+            return CodeGeneration.CodeGenerator.GenerateFromFile(@"Templates\Form.cstemplate", global).Result;
         }
     }
 }

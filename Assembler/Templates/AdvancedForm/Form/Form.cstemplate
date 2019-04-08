@@ -1,0 +1,51 @@
+﻿public class Form1 : Form {
+
+	/*[GENERATE] 
+		<- { return GenerateFromFile(@"Templates\AdvancedForm\Pages\Page1.cstemplate",  Global); } 
+		<- { return GenerateFromFile(@"Templates\AdvancedForm\Pages\Page2.cstemplate",  Global); } 
+		<- { return GenerateFromFile(@"Templates\AdvancedForm\Pages\Page3.cstemplate",  Global); } 
+		<- { return GenerateFromFile(@"Templates\AdvancedForm\Pages\Page4.cstemplate",  Global); } 
+	*/;
+
+	private System.ComponentModel.IContainer components = null;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && (components != null))
+        {
+            components.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    private void InitializeComponent()
+    {
+        this.SuspendLayout();
+        // 
+        // Form1
+        // 
+        this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.ClientSize = new System.Drawing.Size(511, 348);
+        this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+        this.MaximizeBox = false;
+        this.MinimizeBox = false;
+        this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+        this.Text = "Form1";
+        this.ResumeLayout(false);
+
+    }
+
+    private const int WS_SYSMENU = 0x80000;
+    protected override CreateParams CreateParams
+    {
+        get
+        {
+            CreateParams cp = base.CreateParams;
+            cp.Style &= ~WS_SYSMENU;
+            return cp;
+        }
+    }
+
+	/*[GENERATE] <- { return Global.FormCode; } */
+}

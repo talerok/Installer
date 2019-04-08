@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
 namespace CodeGeneration
 {
     public class ScriptGlobal<T>
@@ -25,12 +26,12 @@ namespace CodeGeneration
             Global = global;
         }
     }
-   
+
     public static class CodeGenerator
     {
         private const string _blockPattern = "//-+?\\[GENERATE-START\\]-+\r?\n?([\\w\\W]+?)//-+?\\[GENERATE-END\\]-+\r?\n?";
         private const string _commentPattern = @"/\*\W*[GENERATE]([\w\W]*?)\*/";
-        private const string _funcPattern = @"<- *\{([\w\W]*)\}";
+        private const string _funcPattern = @"<- *\{([^(<\-)]*)\}";
 
         private static readonly string[] _nameSpaces =
         {
@@ -38,11 +39,11 @@ namespace CodeGeneration
             "System.Text",
             "System.Collections.Generic",
             "System.Linq",
-            "CodeGeneration.Components"
+            "CodeGeneration.Components",
+            "Localization"
         };
 
-        private static async Task<string> _compileFuncs<T>(IEnumerable<string> funcs, T global)
-        {
+        private static string _generateProccesCode(IEnumerable<string> funcs) {
             var code = new StringBuilder();
             code.AppendLine(Components.NameSpacesGenerator.Generate(_nameSpaces));
             code.AppendLine("var funcs = new List<Func<string>>();");
@@ -50,15 +51,28 @@ namespace CodeGeneration
                 code.AppendLine($@"funcs.Add({Components.LambdaGenerator.Generate(func, new string[] { })});");
 
             code.AppendLine(@"String.Join(""\n"", funcs.Select(x => x()))");
+            return code.ToString();
+        }
 
-            return await CSharpScript.EvaluateAsync<string>(
-                code: code.ToString(),
-                globals: new ScriptGlobal<T>(global),
-                globalsType: typeof(ScriptGlobal<T>),
-                options: ScriptOptions.Default.AddReferences(
-                    typeof(System.Linq.Enumerable).Assembly,
-                    typeof(Components.CatchGenerator).Assembly
-                ));
+        private static async Task<string> _compileFuncs<T>(IEnumerable<string> funcs, T global)
+        {
+            var code = _generateProccesCode(funcs);
+            try
+            {
+                return await CSharpScript.EvaluateAsync<string>(
+                    code: code,
+                    globals: new ScriptGlobal<T>(global),
+                    globalsType: typeof(ScriptGlobal<T>),
+                    options: ScriptOptions.Default.AddReferences(
+                        typeof(Localization.Resources).Assembly,
+                        typeof(System.Linq.Enumerable).Assembly,
+                        typeof(Components.CatchGenerator).Assembly,
+                        global.GetType().Assembly
+                    ));
+            }catch(Exception ex)
+            {
+                throw new CodeGeneratorException($"{ex.Message}\n({code})");
+            }
         }
         
         private static async Task<string> _formatBlock<T>(string code, T global)
@@ -102,13 +116,7 @@ namespace CodeGeneration
 
         public static async Task<string> GenerateFromFile<T>(string filePath, T global)
         {
-            try
-            {
-                return await _formatCode(File.ReadAllText(filePath), global);
-            }catch(Exception ex)
-            {
-                throw new CodeGeneratorException(ex.Message);
-            }
+            return await _formatCode(File.ReadAllText(filePath), global);
         }
     }
 }

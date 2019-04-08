@@ -6,11 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="2.10.0" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Assembler\Assembler.csproj" />
     <ProjectReference Include="..\JSONConfigReader\JSONConfigReader.csproj" />
   </ItemGroup>
@@ -22,9 +17,5 @@
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties config_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="set libsFolder=$(ProjectDir)\$(OutDir)\Libs&#xD;&#xA;&#xD;&#xA;if not exist %libsFolder% (&#xD;&#xA;     mkdir %libsFolder%&#xD;&#xA;)&#xD;&#xA;&#xD;&#xA;del %libsFolder%\* /q&#xD;&#xA;&#xD;&#xA;copy /y /d  &quot;$(SolutionDir)\InstallerLib\$(OutDir)*.dll&quot; %libsFolder%&#xD;&#xA;" />
-  </Target>
 
 </Project>

@@ -1,0 +1,170 @@
+﻿public class Page3 : UserControl {
+	
+	private System.ComponentModel.IContainer components = null;
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing && (components != null))
+        {
+            components.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    private void InitializeComponent()
+    {
+        this.InstallProccessTextBox = new System.Windows.Forms.RichTextBox();
+        this.InstallProgressBar = new System.Windows.Forms.ProgressBar();
+        this.PreventButton = new System.Windows.Forms.Button();
+        this.groupBox1 = new System.Windows.Forms.GroupBox();
+        this.groupBox1.SuspendLayout();
+        this.SuspendLayout();
+        // 
+        // InstallProccessTextBox
+        // 
+        this.InstallProccessTextBox.Location = new System.Drawing.Point(3, 3);
+        this.InstallProccessTextBox.Name = "InstallProccessTextBox";
+        this.InstallProccessTextBox.ReadOnly = true;
+        this.InstallProccessTextBox.Size = new System.Drawing.Size(504, 272);
+        this.InstallProccessTextBox.TabIndex = 5;
+        this.InstallProccessTextBox.Text = "";
+        // 
+        // InstallProgressBar
+        // 
+        this.InstallProgressBar.Location = new System.Drawing.Point(3, 281);
+        this.InstallProgressBar.Name = "InstallProgressBar";
+        this.InstallProgressBar.Size = new System.Drawing.Size(504, 23);
+        this.InstallProgressBar.TabIndex = 4;
+        // 
+        // PreventButton
+        // 
+        this.PreventButton.Location = new System.Drawing.Point(437, 11);
+        this.PreventButton.Name = "PreventButton";
+        this.PreventButton.Size = new System.Drawing.Size(75, 23);
+        this.PreventButton.TabIndex = 7;
+        this.PreventButton.Text = /*[GENERATE] <- { return StringGenerator.Generate(Resources.CancelInstallButtonText); } */;
+        this.PreventButton.UseVisualStyleBackColor = true;
+        // 
+        // groupBox1
+        // 
+        this.groupBox1.Controls.Add(this.PreventButton);
+        this.groupBox1.Location = new System.Drawing.Point(-5, 310);
+        this.groupBox1.Name = "groupBox1";
+        this.groupBox1.Size = new System.Drawing.Size(525, 40);
+        this.groupBox1.TabIndex = 13;
+        this.groupBox1.TabStop = false;
+        // 
+        // Page3
+        // 
+        this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.BackColor = System.Drawing.SystemColors.Window;
+        this.Controls.Add(this.groupBox1);
+        this.Controls.Add(this.InstallProccessTextBox);
+        this.Controls.Add(this.InstallProgressBar);
+        this.Name = "Page3";
+        this.Size = new System.Drawing.Size(510, 350);
+        this.groupBox1.ResumeLayout(false);
+        this.ResumeLayout(false);
+
+    }
+
+    private System.Windows.Forms.RichTextBox InstallProccessTextBox;
+    private System.Windows.Forms.ProgressBar InstallProgressBar;
+    private System.Windows.Forms.Button PreventButton;
+    private System.Windows.Forms.GroupBox groupBox1;
+
+	private bool _prevent = false;
+    public Page4 LastPage { get; set; }
+    public string Path { get; set; }
+    public bool DesktopShortCuts { get; set; }
+    public bool StartMenuShortCuts { get; set; }
+    public bool StartUp { get; set; }
+
+	private void _showNextPage(string information, bool blockButton) {
+		LastPage.Path = Path;
+		LastPage.SetInformation(information);
+		if (blockButton)
+		LastPage.BlockStartCheckBox();
+		this.Visible = false;
+		LastPage.Visible = true;
+	}
+
+	private enum InstallEventType
+    {
+        Message,
+        Error,
+        SetProgress,
+        SetProgressMaxValue,
+        SuccesInstall,
+        FailInstall,
+        CanceledInstall
+    }
+
+    private class InstallProcessEventArgs : EventArgs
+    {
+        public InstallEventType EventType { get; }
+        public object Info { get; }
+
+        public InstallProcessEventArgs(InstallEventType eventType)
+        {
+            EventType = eventType;
+        }
+
+        public InstallProcessEventArgs(InstallEventType eventType, object info)
+        {
+            EventType = eventType;
+            Info = info;
+        }
+    }
+
+    private EventHandler<InstallProcessEventArgs> InstallProcessEventHandler;
+
+	private void _installEvent(object sender, InstallProcessEventArgs args){
+		this.BeginInvoke((MethodInvoker)(delegate {
+			switch(args.EventType) {
+				case InstallEventType.Message:
+					InstallProccessTextBox.AppendText((string)args.Info + "\n");
+				break;
+				case InstallEventType.Error:
+					InstallProccessTextBox.AppendText((string)args.Info + "\n");
+				break;
+				case InstallEventType.SuccesInstall:
+					_showNextPage(/*[GENERATE] <- { return StringGenerator.Generate(Global.Config.AfterInstallMessage, false); } */, false);
+				break;
+				case InstallEventType.FailInstall:
+					_showNextPage(/*[GENERATE] <- { return StringGenerator.Generate(Resources.InstallationError); } */ + (string)args.Info, true);
+				break;
+				case InstallEventType.CanceledInstall:
+					_showNextPage(/*[GENERATE] <- { return StringGenerator.Generate(Resources.InstallationCanceled); } */, true);
+				break;
+				case InstallEventType.SetProgressMaxValue:
+					InstallProgressBar.Maximum = (int)args.Info;
+				break;
+				case InstallEventType.SetProgress:
+					InstallProgressBar.Value = (int)args.Info;
+				break;
+			}
+		}));
+	}
+	
+	private void _installProcess(){
+		/*[GENERATE] <- {
+			return Global.InstallProccesCode;
+		}*/
+	}
+
+	public void StartInstall(){
+		new Thread(new ThreadStart(_installProcess)).Start();
+	}
+
+	public Page3(){
+		InitializeComponent();
+		this.Visible = false;
+		InstallProcessEventHandler += _installEvent;
+		PreventButton.Click += (o, e) => {
+			if (MessageBox.Show("{Resources.CancelInstallQuestion}", "{Resources.InstallationMessageTittle}", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+				_prevent = true;
+		};
+	}
+}
